@@ -29,55 +29,44 @@ type Phase = 'idle' | 'generating' | 'complete'
 /* ── Idle state ── */
 function IdleState() {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-10 py-16">
+    <div className="flex-1 flex flex-col items-center justify-center" style={{ padding: '40px 24px' }}>
       {/* Terminal preview */}
-      <div
-        style={{
-          fontFamily: "'Geist Mono', monospace",
-          fontSize: '11px',
-          lineHeight: '2',
-          color: 'var(--text-4)',
-          backgroundColor: 'var(--bg-2)',
-          border: '1px solid var(--border)',
-          borderRadius: '8px',
-          padding: '20px',
-          width: '100%',
-          maxWidth: '380px',
-          marginBottom: '24px',
-        }}
-      >
-        <div>
-          <span style={{ color: 'var(--text-4)' }}>$ </span>
-          <span style={{ color: 'var(--text-3)' }}>smd generate --streaming</span>
-        </div>
+      <div style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: 11,
+        lineHeight: 2,
+        color: 'var(--text-4)',
+        backgroundColor: 'var(--bg-2)',
+        border: '1px solid var(--border)',
+        borderRadius: 10,
+        padding: '16px 20px',
+        width: '100%',
+        maxWidth: 400,
+        marginBottom: 20,
+      }}>
+        <div><span style={{ color: 'var(--text-4)' }}>$ </span><span style={{ color: 'var(--text-3)' }}>smd generate --streaming</span></div>
         <div style={{ color: 'var(--text-4)' }}>{'  // waiting for input...'}</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <span style={{ color: 'var(--text-4)' }}>$ </span>
-          <span
-            style={{
-              display: 'inline-block',
-              width: '6px',
-              height: '12px',
-              backgroundColor: 'var(--text-3)',
-              animation: 'blink 1.1s step-end infinite',
-            }}
-          />
+          <span style={{ display: 'inline-block', width: 6, height: 12, backgroundColor: 'var(--text-3)', animation: 'blink 1.1s step-end infinite' }} />
         </div>
       </div>
 
-      <p style={{ fontFamily: "'Geist', system-ui, sans-serif", fontSize: '13px', fontWeight: 500, color: 'var(--text-2)', marginBottom: '4px' }}>
+      <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-2)', marginBottom: 6, textAlign: 'center' }}>
         Ready to generate
       </p>
-      <p style={{ fontFamily: "'Geist', system-ui, sans-serif", fontSize: '12px', color: 'var(--text-3)', lineHeight: '1.6', maxWidth: '280px', textAlign: 'center' }}>
-        Enter your startup idea on the left and hit generate.
+      <p style={{ fontSize: 12, color: 'var(--text-3)', lineHeight: 1.65, maxWidth: 320, textAlign: 'center' }}>
+        Type your startup idea above and hit <strong style={{ color: 'var(--text-2)' }}>Generate</strong> — AI will build a complete blueprint in under 60 seconds.
       </p>
 
-      <style>{`
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
-        }
-      `}</style>
+      {/* Feature chips */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 20, justifyContent: 'center', maxWidth: 400 }}>
+        {['Architecture', 'DB Schema', 'API Design', 'Revenue Model', 'Build Kit', 'AI Feedback'].map(label => (
+          <span key={label} style={{ fontFamily: 'var(--font-mono)', fontSize: 10, padding: '3px 10px', borderRadius: 5, border: '1px solid var(--border-2)', color: 'var(--text-4)', background: 'var(--bg-3)' }}>
+            {label}
+          </span>
+        ))}
+      </div>
     </div>
   )
 }
@@ -159,75 +148,65 @@ function ResultView({
   ]
 
   return (
-    <div style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', minHeight: 0 }}>
 
-      {/* ── Left sidebar: score + actions ── */}
+      {/* ── Score bar ── */}
       <div style={{
-        width: 200,
-        minWidth: 200,
-        borderRight: '1px solid var(--border)',
-        display: 'flex',
-        flexDirection: 'column',
-        overflowY: 'auto',
-        background: 'var(--bg-2)',
         flexShrink: 0,
+        borderBottom: '1px solid var(--border)',
+        background: 'var(--bg-2)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 20,
+        padding: '10px 24px',
       }}>
-        {/* Score hero */}
-        <div style={{ padding: '20px 16px', borderBottom: '1px solid var(--border)' }}>
-          <p style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-4)', marginBottom: 10 }}>
-            Blueprint Score
-          </p>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 40, fontWeight: 700, lineHeight: 1, color: scoreColor, letterSpacing: '-0.04em' }}>
-              {content.skor.toplam}
-            </span>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-4)' }}>/100</span>
-          </div>
-          <div style={{ height: 4, background: 'var(--border-2)', borderRadius: 99, overflow: 'hidden', marginBottom: 8 }}>
-            <div style={{ height: '100%', width: `${content.skor.toplam}%`, background: scoreColor, borderRadius: 99 }} />
-          </div>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', padding: '3px 8px', borderRadius: 5, background: scoreColor + '18', color: scoreColor }}>
-            {scoreLabel}
+        {/* Project name */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginRight: 4 }}>
+          <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />
+          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', maxWidth: 280, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {result.title}
           </span>
         </div>
 
-        {/* Sub scores */}
-        <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
-          <p style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-4)', marginBottom: 12 }}>
-            Sub Scores
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {SUB_SCORES.map(({ key, label, color }) => (
-              <div key={key}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600, color }}>{content.skor[key]}</span>
-                </div>
-                <div style={{ height: 3, background: 'var(--border-2)', borderRadius: 99, overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: `${content.skor[key]}%`, background: color, borderRadius: 99, transition: 'width 0.7s ease' }} />
-                </div>
+        {/* Divider */}
+        <div style={{ width: 1, height: 20, background: 'var(--border-2)', flexShrink: 0 }} />
+
+        {/* Score number */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 700, color: scoreColor, letterSpacing: '-0.04em', lineHeight: 1 }}>
+            {content.skor.toplam}
+          </span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <div style={{ width: 100, height: 3, background: 'var(--border-2)', borderRadius: 99, overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${content.skor.toplam}%`, background: scoreColor, borderRadius: 99 }} />
+            </div>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', color: scoreColor }}>
+              {scoreLabel}
+            </span>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div style={{ width: 1, height: 20, background: 'var(--border-2)', flexShrink: 0 }} />
+
+        {/* Sub scores inline */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, flex: 1 }}>
+          {SUB_SCORES.map(({ key, label, color }) => (
+            <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>{label}</span>
+              <div style={{ width: 48, height: 3, background: 'var(--border-2)', borderRadius: 99, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${content.skor[key]}%`, background: color, borderRadius: 99 }} />
               </div>
-            ))}
-          </div>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600, color, minWidth: 20 }}>{content.skor[key]}</span>
+            </div>
+          ))}
         </div>
-
-        {/* Blueprint title */}
-        <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
-          <p style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Project</p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />
-            <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text)', lineHeight: 1.4 }}>{result.title}</span>
-          </div>
-        </div>
-
-        {/* Spacer */}
-        <div style={{ flex: 1 }} />
 
         {/* Actions */}
-        <div style={{ padding: '12px', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, marginLeft: 'auto' }}>
           <Link
             href={`/generate/${result.id}`}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '7px 12px', fontSize: 11, fontWeight: 500, color: 'var(--text-2)', border: '1px solid var(--border)', borderRadius: 7, textDecoration: 'none', transition: 'all 120ms', background: 'transparent' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 12px', fontSize: 11, fontWeight: 500, color: 'var(--text-2)', border: '1px solid var(--border)', borderRadius: 7, textDecoration: 'none', transition: 'all 120ms', background: 'transparent', whiteSpace: 'nowrap' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--bg-3)'; (e.currentTarget as HTMLElement).style.color = 'var(--text)' }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'var(--text-2)' }}
           >
@@ -238,7 +217,7 @@ function ResultView({
           </Link>
           <button
             onClick={onRegenerateClick}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '7px 12px', fontSize: 11, fontWeight: 500, color: 'var(--text-2)', border: '1px solid var(--border)', borderRadius: 7, cursor: 'pointer', transition: 'all 120ms', background: 'transparent' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 12px', fontSize: 11, fontWeight: 500, color: 'var(--text-2)', border: '1px solid var(--border)', borderRadius: 7, cursor: 'pointer', transition: 'all 120ms', background: 'transparent', whiteSpace: 'nowrap' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--bg-3)'; (e.currentTarget as HTMLElement).style.color = 'var(--text)' }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'var(--text-2)' }}
           >
@@ -249,7 +228,7 @@ function ResultView({
           </button>
           <button
             onClick={onSaveToLibrary}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 12px', fontSize: 11, fontWeight: 600, color: 'white', background: 'var(--accent)', border: 'none', borderRadius: 7, cursor: 'pointer', transition: 'all 120ms', boxShadow: '0 2px 8px rgba(99,102,241,0.25)' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 14px', fontSize: 11, fontWeight: 600, color: 'white', background: 'var(--accent)', border: 'none', borderRadius: 7, cursor: 'pointer', transition: 'all 120ms', boxShadow: '0 2px 8px rgba(99,102,241,0.25)', whiteSpace: 'nowrap' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--accent-hover)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)' }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--accent)'; (e.currentTarget as HTMLElement).style.transform = 'none' }}
           >
@@ -261,31 +240,31 @@ function ResultView({
         </div>
       </div>
 
-      {/* ── Right: accordion sections + build kit ── */}
-      <div style={{
-        flex: 1,
-        overflowY: 'auto',
-        padding: '20px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 8,
-        background: 'var(--bg)',
-      }}
+      {/* ── Content: two column accordion + build kit ── */}
+      <div
+        style={{ flex: 1, overflowY: 'auto', padding: '24px 28px', background: 'var(--bg)' }}
         className="[&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-[var(--border-2)] [&::-webkit-scrollbar-thumb]:rounded-full"
       >
-        <SectionAccordion content={content} defaultOpen={['concept']} />
-        {result.build_kit && (
-          <BuildKitPanel
-            blueprintId={result.id}
-            cursorrules={result.build_kit.cursorrules ?? undefined}
-            buildMd={result.build_kit.build_md ?? undefined}
-            schemaSql={result.build_kit.schema_sql ?? undefined}
-            envExample={result.build_kit.env_example ?? undefined}
-            readmeMd={result.build_kit.readme_md ?? undefined}
-          />
-        )}
-        {/* Bottom padding */}
-        <div style={{ height: 20 }} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, maxWidth: 1200, margin: '0 auto' }}>
+          {/* Left col */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <SectionAccordion content={content} defaultOpen={['concept']} />
+          </div>
+          {/* Right col: build kit */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {result.build_kit && (
+              <BuildKitPanel
+                blueprintId={result.id}
+                cursorrules={result.build_kit.cursorrules ?? undefined}
+                buildMd={result.build_kit.build_md ?? undefined}
+                schemaSql={result.build_kit.schema_sql ?? undefined}
+                envExample={result.build_kit.env_example ?? undefined}
+                readmeMd={result.build_kit.readme_md ?? undefined}
+              />
+            )}
+          </div>
+        </div>
+        <div style={{ height: 32 }} />
       </div>
 
     </div>
@@ -535,86 +514,63 @@ export default function GeneratePage() {
         </div>
       </div>
 
-      {/* Two Column Layout */}
+      {/* Top: input bar */}
+      <InputPanel
+        onGenerate={handleGenerate}
+        isGenerating={isGenerating}
+        tokenUsagePercent={tokenUsagePercent}
+        tokenUsageLabel={tokenUsageLabel}
+        onClear={handleRetry}
+      />
+
+      {/* Bottom: output — flex-1, full width */}
       <div
-        className="flex flex-1 overflow-hidden min-h-0"
-        style={{ borderTop: 'none' }}
+        className="flex flex-col flex-1 overflow-hidden min-h-0 relative"
+        style={{ background: 'var(--bg)' }}
       >
-        {/* ── Left panel: input ── */}
-        <InputPanel
-          onGenerate={handleGenerate}
-          isGenerating={isGenerating}
-          tokenUsagePercent={tokenUsagePercent}
-          tokenUsageLabel={tokenUsageLabel}
-          onClear={handleRetry}
-        />
+        {/* Error */}
+        {error && phase === 'idle' && (
+          <>
+            <div className="px-6 py-4 border-b flex items-center gap-[7px] flex-shrink-0" style={{ borderColor: 'var(--border)' }}>
+              <div className="w-[5px] h-[5px] rounded-full" style={{ background: 'var(--red)' }} />
+              <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '10px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-3)' }}>error</span>
+            </div>
+            <ErrorState message={error} onRetry={handleRetry} />
+          </>
+        )}
 
-        {/* ── Right panel: output ── */}
-        <div
-          className="flex flex-col flex-1 overflow-hidden min-w-0 relative"
-          style={{ background: 'var(--bg)' }}
-        >
-          {/* Hata durumu */}
-          {error && phase === 'idle' && (
-            <>
-              <div
-                className="px-6 py-4 border-b flex items-center gap-[7px] flex-shrink-0"
-                style={{ borderColor: 'var(--border)' }}
-              >
-                <div className="w-[5px] h-[5px] rounded-full" style={{ background: 'var(--red)' }} />
-                <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '10px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-3)' }}>error</span>
-              </div>
-              <ErrorState message={error} onRetry={handleRetry} />
-            </>
-          )}
+        {/* Idle */}
+        {!error && phase === 'idle' && <IdleState />}
 
-          {/* Idle state */}
-          {!error && phase === 'idle' && (
-            <>
-              <div
-                className="px-6 py-4 border-b flex items-center gap-[7px] flex-shrink-0"
-                style={{ borderColor: 'var(--border)' }}
-              >
-                <div className="w-[5px] h-[5px] rounded-full" style={{ background: 'var(--text-4)' }} />
-                <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '10px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-3)' }}>output</span>
-              </div>
-              <IdleState />
-            </>
-          )}
+        {/* Generating */}
+        {phase === 'generating' && (
+          <TerminalPanel
+            lines={generationLog}
+            progress={generationProgress}
+            isGenerating={isGenerating}
+            blueprintTitle={blueprintTitle}
+          />
+        )}
 
-          {/* Generation terminal */}
-          {phase === 'generating' && (
-            <TerminalPanel
-              lines={generationLog}
-              progress={generationProgress}
-              isGenerating={isGenerating}
-              blueprintTitle={blueprintTitle}
-            />
-          )}
+        {/* Loading result */}
+        {loadingResult && (
+          <>
+            <div className="px-6 py-4 border-b flex items-center gap-[7px] flex-shrink-0" style={{ borderColor: 'var(--border)' }}>
+              <div className="w-[5px] h-[5px] rounded-full bg-[var(--yellow)] animate-pulse" />
+              <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '10px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-3)' }}>loading blueprint...</span>
+            </div>
+            <ResultSkeleton />
+          </>
+        )}
 
-          {/* Loading result */}
-          {loadingResult && (
-            <>
-              <div
-                className="px-6 py-4 border-b flex items-center gap-[7px] flex-shrink-0"
-                style={{ borderColor: 'var(--border)' }}
-              >
-                <div className="w-[5px] h-[5px] rounded-full bg-[var(--yellow)] animate-pulse" />
-                <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '10px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-3)' }}>loading blueprint...</span>
-              </div>
-              <ResultSkeleton />
-            </>
-          )}
-
-          {/* Complete — result */}
-          {phase === 'complete' && blueprintResult && !loadingResult && (
-            <ResultView
-              result={blueprintResult}
-              onRegenerateClick={handleRetry}
-              onSaveToLibrary={handleSaveToLibrary}
-            />
-          )}
-        </div>
+        {/* Complete */}
+        {phase === 'complete' && blueprintResult && !loadingResult && (
+          <ResultView
+            result={blueprintResult}
+            onRegenerateClick={handleRetry}
+            onSaveToLibrary={handleSaveToLibrary}
+          />
+        )}
       </div>
     </div>
   )
