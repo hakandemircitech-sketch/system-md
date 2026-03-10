@@ -67,6 +67,15 @@ const NAV_BOTTOM = [
       </svg>
     ),
   },
+  {
+    href: '/',
+    label: 'Ana Sayfa',
+    icon: (
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" className="w-[15px] h-[15px] shrink-0">
+        <path d="M1.5 7L8 1.5 14.5 7V14H10V10H6v4H1.5V7z" />
+      </svg>
+    ),
+  },
 ]
 
 const PLAN_LIMITS: Record<string, number> = { free: 10, pro: 30, team: 150 }

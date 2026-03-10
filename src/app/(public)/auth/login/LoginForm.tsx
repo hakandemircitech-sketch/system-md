@@ -129,7 +129,13 @@ function LoginForm() {
     setError(null)
     const { error } = await getSupabase().auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=${redirectTo}` },
+      options: {
+        redirectTo: `https://system-md.com/auth/callback?next=${redirectTo}`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
     })
     if (error) { setError(error.message); setGoogleLoading(false) }
   }

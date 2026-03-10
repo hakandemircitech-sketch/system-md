@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function PublicHeader() {
   const [scrolled, setScrolled] = useState(false)
@@ -161,19 +162,14 @@ function Logo({ onClick }: { onClick?: () => void }) {
       onClick={onClick}
       style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
     >
-      <span
-        style={{
-          fontFamily: "'Geist Mono', monospace",
-          fontSize: '13px',
-          fontWeight: 500,
-          letterSpacing: '-0.02em',
-          color: 'var(--foreground)',
-        }}
-      >
-        System
-        <span style={{ color: 'var(--accent)' }}>MD</span>
-        <span className="cursor-blink" style={{ color: 'var(--accent)' }}>_</span>
-      </span>
+      <Image
+        src="/logo-yatay.png"
+        alt="System-md"
+        width={130}
+        height={32}
+        priority
+        style={{ objectFit: 'contain', height: '32px', width: 'auto' }}
+      />
     </Link>
   )
 }
