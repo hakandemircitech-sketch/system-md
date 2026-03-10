@@ -55,9 +55,7 @@ export default function PublicHeader() {
           style={{ alignItems: 'center', gap: '12px' }}
         >
           <GhostLink href="#pricing">pricing</GhostLink>
-          <GhostLink href="/auth/login">sign in</GhostLink>
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
-          <FilledLink href="/auth/signup">start building →</FilledLink>
         </nav>
 
         {/* Mobile: tema toggle + hamburger */}
@@ -153,10 +151,6 @@ export default function PublicHeader() {
             }}
           >
             <MobileLink href="#pricing" onClick={close}>pricing</MobileLink>
-            <MobileLink href="/auth/login" onClick={close}>sign in</MobileLink>
-            <MobileLink href="/auth/signup" onClick={close} accent>
-              start building →
-            </MobileLink>
           </div>
         </div>
       )}

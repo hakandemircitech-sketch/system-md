@@ -1,9 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
 
-type Phase = 'idle' | 'email_gate' | 'generating' | 'done' | 'error' | 'verify_pending'
+type Phase = 'idle' | 'generating' | 'done' | 'error'
 
 interface TerminalLine {
   text: string
@@ -18,72 +17,16 @@ function classify(text: string): TerminalLine['type'] {
   return 'default'
 }
 
-function EmailGate({
-  onSubmit,
-  loading,
-  error,
-  onClose,
-}: {
-  onSubmit: (email: string) => void
-  loading: boolean
-  error: string | null
-  onClose: () => void
-}) {
-  const [email, setEmail] = useState('')
-  return (
-    <div style={{ position:'fixed',inset:0,background:'rgba(10,10,10,0.85)',backdropFilter:'blur(6px)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:50,padding:'24px' }}>
-      <div style={{ width:'100%',maxWidth:'400px',background:'var(--bg-2)',border:'1px solid var(--border)',borderRadius:'12px',padding:'32px' }}>
-        <p style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:'var(--accent)',textTransform:'uppercase',letterSpacing:'0.12em',marginBottom:'10px' }}>free · no credit card</p>
-        <h2 style={{ fontFamily:"'Instrument Serif',Georgia,serif",fontSize:'24px',fontWeight:400,color:'var(--text)',letterSpacing:'-0.02em',lineHeight:1.2,marginBottom:'8px' }}>Enter your email to generate.</h2>
-        <p style={{ fontFamily:"'Geist',system-ui,sans-serif",fontSize:'13px',color:'var(--text-3)',lineHeight:1.6,marginBottom:'20px' }}>Your blueprint will be ready to download. Free to start.</p>
-        {error && (
-          <div style={{ padding:'10px 12px',borderRadius:'6px',background:'rgba(220,38,38,0.06)',border:'1px solid rgba(220,38,38,0.2)',marginBottom:'16px',fontFamily:"'Geist Mono',monospace",fontSize:'11px',color:'var(--red)' }}>
-            {error}
-          </div>
-        )}
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && email && onSubmit(email)}
-          placeholder="you@company.com"
-          autoFocus
-          style={{ width:'100%',padding:'10px 12px',background:'var(--bg-3)',border:'1px solid var(--border-2)',borderRadius:'8px',fontSize:'14px',fontFamily:"'Geist',system-ui,sans-serif",color:'var(--text)',outline:'none',marginBottom:'12px',boxSizing:'border-box' }}
-        />
-        <button
-          onClick={() => email && onSubmit(email)}
-          disabled={loading || !email}
-          style={{ width:'100%',padding:'12px',background:loading||!email?'var(--bg-4)':'var(--accent)',color:loading||!email?'var(--text-3)':'white',border:'none',borderRadius:'8px',fontSize:'13px',fontFamily:"'Geist Mono',monospace",fontWeight:500,cursor:loading||!email?'not-allowed':'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',transition:'all 140ms ease' }}
-        >
-          {loading
-            ? (<><span style={{ width:12,height:12,border:'1.5px solid var(--text-4)',borderTopColor:'var(--text-2)',borderRadius:'50%',animation:'spin 0.7s linear infinite',display:'inline-block' }} />preparing...</>)
-            : 'generate blueprint →'
-          }
-        </button>
-        <button
-          onClick={onClose}
-          style={{ width:'100%',marginTop:'8px',padding:'8px',background:'transparent',border:'none',fontSize:'11px',fontFamily:"'Geist Mono',monospace",color:'var(--text-4)',cursor:'pointer' }}
-        >
-          cancel
-        </button>
-      </div>
-    </div>
-  )
-}
-
 export default function LandingClient() {
   const [idea, setIdea] = useState('')
   const [phase, setPhase] = useState<Phase>('idle')
   const [termLines, setTermLines] = useState<TerminalLine[]>([])
   const [progress, setProgress] = useState(0)
-  const [emailError, setEmailError] = useState<string | null>(null)
-  const [emailLoading, setEmailLoading] = useState(false)
   const [zipBlob, setZipBlob] = useState<Blob | null>(null)
   const [blueprintTitle, setBlueprintTitle] = useState('')
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const shownMilestones = useRef<Set<number>>(new Set())
-  const pendingEmail = useRef<string>('')
   const MAX = 500
 
   // Message form state
@@ -120,45 +63,14 @@ export default function LandingClient() {
 
   function handleAnalyze() {
     if (!idea.trim() || idea.length < 10) return
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
-        window.location.href = `/generate?idea=${encodeURIComponent(idea.trim())}`
-      } else {
-        window.location.href = '/auth/signup'
-      }
-    })
+    setPhase('generating')
+    setTermLines([])
+    setProgress(0)
+    setZipBlob(null)
+    startGeneration()
   }
 
-  async function handleEmailSubmit(email: string) {
-    setEmailLoading(true)
-    setEmailError(null)
-    try {
-      const res = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setEmailError(data.error || 'Something went wrong. Please try again.')
-        setEmailLoading(false)
-        return
-      }
-      pendingEmail.current = email
-      setEmailLoading(false)
-      if (data.requiresVerification) {
-        setPhase('verify_pending')
-        return
-      }
-      startGeneration(email)
-    } catch (err) {
-      setEmailError(err instanceof Error ? err.message : 'Something went wrong')
-      setEmailLoading(false)
-    }
-  }
-
-  async function startGeneration(email: string) {
+  async function startGeneration() {
     setPhase('generating')
     setTermLines([])
     setProgress(0)
@@ -170,7 +82,7 @@ export default function LandingClient() {
       const res = await fetch('/api/blueprint/public-generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idea_text: idea, email }),
+        body: JSON.stringify({ idea_text: idea }),
       })
       if (!res.ok || !res.body) {
         const j = await res.json().catch(() => ({}))
@@ -381,22 +293,6 @@ export default function LandingClient() {
               zIndex: 1,
             }} />
           </button>
-          <a
-            href="/auth/login"
-            style={{ fontFamily:"'Geist Mono',monospace",fontSize:'12px',color:'var(--text-2)',textDecoration:'none',padding:'7px 14px',border:'1px solid var(--border-2)',borderRadius:'8px',transition:'all 140ms ease',background:'transparent' }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor='var(--text-3)'; e.currentTarget.style.color='var(--text)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor='var(--border-2)'; e.currentTarget.style.color='var(--text-2)' }}
-          >
-            sign in
-          </a>
-          <a
-            href="/auth/signup"
-            style={{ fontFamily:"'Geist Mono',monospace",fontSize:'12px',color:'white',textDecoration:'none',padding:'7px 14px',background:'var(--accent)',border:'1px solid var(--accent)',borderRadius:'8px',transition:'all 140ms ease' }}
-            onMouseEnter={(e) => { e.currentTarget.style.opacity='0.88' }}
-            onMouseLeave={(e) => { e.currentTarget.style.opacity='1' }}
-          >
-            get started →
-          </a>
         </div>
       </header>
 
@@ -858,72 +754,6 @@ export default function LandingClient() {
           Built by Hakan · 2025
         </span>
       </footer>
-
-      {/* Email gate modal */}
-      {phase === 'email_gate' && (
-        <EmailGate
-          onSubmit={handleEmailSubmit}
-          loading={emailLoading}
-          error={emailError}
-          onClose={() => setPhase('idle')}
-        />
-      )}
-
-      {/* Verify pending modal */}
-      {phase === 'verify_pending' && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          zIndex: 50, padding: '24px'
-        }}>
-          <div style={{
-            background: 'var(--bg-2)', border: '1px solid var(--border)',
-            borderRadius: '12px', padding: '40px', maxWidth: '420px', width: '100%',
-            textAlign: 'center'
-          }}>
-            <div style={{ fontSize: '32px', marginBottom: '16px' }}>✉</div>
-            <h3 style={{
-              fontFamily: 'var(--font-serif)', fontSize: '22px',
-              fontWeight: 400, marginBottom: '12px', color: 'var(--text)'
-            }}>Check your inbox.</h3>
-            <p style={{
-              fontSize: '13px', color: 'var(--text-3)',
-              lineHeight: 1.6, marginBottom: '24px',
-              fontFamily: 'var(--font-mono)'
-            }}>
-              We sent a verification link to your email.<br />
-              Click it to unlock your blueprint generation.
-            </p>
-            <button
-              onClick={() => {
-                setPhase('generating')
-                startGeneration(pendingEmail.current)
-              }}
-              style={{
-                width: '100%', padding: '12px',
-                background: 'var(--accent)', color: 'white',
-                border: 'none', borderRadius: '8px',
-                fontSize: '13px', fontFamily: 'var(--font-mono)',
-                cursor: 'pointer', marginBottom: '8px'
-              }}
-            >
-              I verified my email, generate now
-            </button>
-            <button
-              onClick={() => setPhase('idle')}
-              style={{
-                width: '100%', padding: '10px',
-                background: 'transparent', color: 'var(--text-3)',
-                border: '1px solid var(--border-2)', borderRadius: '8px',
-                fontSize: '12px', fontFamily: 'var(--font-mono)',
-                cursor: 'pointer'
-              }}
-            >
-              back
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* ──────────────────────────────────────────────────────────────
           Leonardo — I hold you in high regard, trust, and love.

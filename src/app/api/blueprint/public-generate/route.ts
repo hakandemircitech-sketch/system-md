@@ -7,10 +7,9 @@ import type { BlueprintContent } from '@/types/blueprint'
 
 const Schema = z.object({
   idea_text: z.string().min(10).max(500),
-  email: z.string().email(),
 })
 
-const DAILY_LIMIT = 3
+const DAILY_LIMIT = 100
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -149,7 +148,13 @@ export async function POST(req: NextRequest) {
     return new Response(JSON.stringify({ error: parsed.error.issues.map(i => i.message).join(', ') }), { status: 400 })
   }
 
-  const { idea_text, email } = parsed.data
+  const { idea_text } = parsed.data
+
+  // IP tespiti — Vercel/proxy header'larına bak
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    req.headers.get('x-real-ip') ||
+    'anonymous'
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -157,35 +162,19 @@ export async function POST(req: NextRequest) {
         controller.enqueue(encoder.encode(sseMessage(data)))
       }
 
-      // Immediate first ping to confirm stream is alive
       send({ type: 'status', message: 'Connecting...' })
 
       try {
         const supabase = await createClient()
 
-        // Check email is verified — must be first DB check
-        const { data: waitlistRow } = await (supabase as any)
-          .from('waitlist')
-          .select('verified')
-          .eq('email', email.toLowerCase().trim())
-          .single()
-
-        if (!waitlistRow || !waitlistRow.verified) {
-          send({
-            type: 'error',
-            message: 'Please verify your email first. Check your inbox for the verification link.',
-          })
-          controller.close()
-          return
-        }
-
+        // IP bazlı günlük limit kontrolü
         const todayStart = new Date()
         todayStart.setHours(0, 0, 0, 0)
 
         const { count } = await (supabase as any)
           .from('public_blueprints')
           .select('id', { count: 'exact', head: true })
-          .eq('email', email.toLowerCase().trim())
+          .eq('ip_address', ip)
           .gte('created_at', todayStart.toISOString())
 
         if ((count ?? 0) >= DAILY_LIMIT) {
@@ -196,7 +185,7 @@ export async function POST(req: NextRequest) {
 
         const { data: record, error: insertError } = await (supabase as any)
           .from('public_blueprints')
-          .insert({ email: email.toLowerCase().trim(), idea_text, status: 'generating' })
+          .insert({ ip_address: ip, idea_text, status: 'generating' })
           .select('id')
           .single()
 
