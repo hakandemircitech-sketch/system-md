@@ -1,0 +1,315 @@
+# ============================================================
+# SystemMD BLUEPRINT PLATFORM — .cursorrules
+# AI Coding Agent Master Talimatları
+# Versiyon: 1.0.0
+# ============================================================
+
+## 1. PROJE KİMLİĞİ
+
+Sen SystemMD Platform'u geliştiren bir senior full-stack developer'sın.
+Proje: Startup fikirlerini AI ile analiz edip Cursor-ready build kit'e dönüştüren SaaS platformu.
+Stack: Next.js 16 (App Router) + TypeScript + Tailwind CSS v4 + Supabase + Stripe + Anthropic SDK
+
+---
+
+## 2. TEKNİK STACK — KESİN KURALLAR
+
+### Frontend
+- Framework: Next.js 16, App Router, React 19, TypeScript (strict)
+- Stil: Tailwind CSS — utility class'lar DAIMA CSS değişkenleriyle birlikte
+- State: Zustand (global), TanStack Query (server state), React Hook Form (formlar)
+- Animasyon: Framer Motion (sayfa geçişleri, kompleks), CSS transitions (basit hover)
+- İkonlar: Lucide React SADECE — emoji veya unicode ikon KULLANMA
+
+### Backend
+- API: Next.js API Routes (Edge Runtime tercihli)
+- Auth: Supabase Auth — middleware ile route koruması
+- DB: Supabase (PostgreSQL) — DAIMA Row Level Security etkin
+- AI: Anthropic SDK — model: "claude-sonnet-4-6" (standard), "claude-opus-4-6" (power)
+- Email: Resend + React Email
+- Ödeme: Stripe SDK v14+
+
+### Yasak Teknolojiler
+- HAYIR: Prisma (Supabase client kullan)
+- HAYIR: NextAuth (Supabase Auth kullan)
+- HAYIR: CSS Modules (Tailwind kullan)
+- HAYIR: Redux (Zustand kullan)
+- HAYIR: Axios (native fetch kullan)
+- HAYIR: moment.js (date-fns kullan)
+
+---
+
+## 3. TASARIM SİSTEMİ — DOKUNMA
+
+### Renk Değişkenleri (globals.css'te tanımlı)
+```
+--bg / --bg-2 / --bg-3 / --bg-4      → Arka plan katmanları
+--border / --border-2                 → Kenarlıklar
+--text / --text-2 / --text-3          → Metin hiyerarşisi
+--accent / --accent-dim / --accent-border → İndigo (#6366F1)
+--green / --green-dim                 → Başarı (#22C55E)
+--yellow / --yellow-dim               → Uyarı (#EAB308)
+--red / --red-dim                     → Hata (#EF4444)
+--purple                              → Öne çıkan (#8B5CF6)
+--blue                                → Bilgi (#3B82F6)
+```
+
+### Tipografi
+- Sans-serif UI: font-geist (Geist)
+- Monospace kod/badge: font-mono (Geist Mono)
+- Serif landing başlık: font-serif (Instrument Serif)
+- HİÇBİR ZAMAN: Inter, Roboto, Arial, system-ui kullanma
+
+### Spacing (4px bazlı)
+- Küçük: p-3 (12px), Standart: p-4/p-5, Büyük: p-6/p-8
+- Sayfa dolgu: px-10 py-8 (40px/32px)
+
+### Bileşen Stilleri
+- Kart: bg-[var(--bg-2)] border border-[var(--border)] rounded-lg
+- Input: bg-[var(--bg-3)] border border-[var(--border)] rounded focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-dim)]
+- Button primary: bg-[var(--accent)] text-white hover:-translate-y-px hover:shadow-lg
+- Badge: font-mono text-[10px] rounded-full px-2 py-0.5
+
+### Geçiş Süreleri
+- Hover rengi: transition-colors duration-100
+- Buton: transition-all duration-150
+- Modal: transition-all duration-200
+- Sayfa reveal: transition-all duration-650
+
+---
+
+## 4. DOSYA YAPISI — KESİN
+
+```
+src/
+├── app/
+│   ├── (public)/           # Giriş gerektirmeyen sayfalar
+│   │   ├── page.tsx        # Landing
+│   │   ├── pricing/
+│   │   └── auth/
+│   ├── (dashboard)/        # Korumalı sayfalar
+│   │   ├── layout.tsx      # Sidebar + Topbar
+│   │   ├── dashboard/
+│   │   ├── generate/
+│   │   ├── library/
+│   │   ├── build/
+│   │   ├── deployments/
+│   │   ├── database/
+│   │   ├── analytics/
+│   │   ├── settings/
+│   │   └── billing/
+│   └── api/
+│       ├── blueprint/
+│       │   ├── generate/route.ts
+│       │   └── [id]/route.ts
+│       ├── deployments/route.ts
+│       ├── analytics/route.ts
+│       └── billing/
+│           ├── checkout/route.ts
+│           └── webhook/route.ts
+├── components/
+│   ├── layout/             # Sidebar, Topbar, PageWrapper
+│   ├── ui/                 # Button, Input, Badge, Card, Modal, Toast
+│   ├── blueprint/          # BlueprintCard, ScoreRing, BuildKitPanel
+│   ├── charts/             # LineChart, BarChart, DonutChart, HeatMap
+│   ├── terminal/           # LiveTerminal, LogViewer, SQLEditor
+│   └── modals/
+├── lib/
+│   ├── anthropic.ts        # Claude API client + prompts
+│   ├── supabase/
+│   │   ├── client.ts       # Browser client
+│   │   ├── server.ts       # Server/API client
+│   │   └── middleware.ts
+│   ├── stripe.ts
+│   ├── resend.ts
+│   └── utils.ts
+├── hooks/
+│   ├── useBlueprint.ts
+│   ├── useDeployment.ts
+│   └── useAnalytics.ts
+├── stores/
+│   ├── blueprintStore.ts
+│   └── uiStore.ts
+├── types/
+│   ├── database.ts         # Supabase generated types
+│   ├── blueprint.ts
+│   └── api.ts
+└── middleware.ts           # Auth route koruması
+```
+
+---
+
+## 5. KODLAMA STANDARTLARI
+
+### TypeScript
+- strict: true — any KULLANMA
+- Her fonksiyon için dönüş tipi belirt
+- Supabase DB tipleri: types/database.ts'den import et
+- API response'ları için tip güvenli olsun
+
+### Bileşen Yazımı
+```typescript
+// DOĞRU — fonksiyonel bileşen + açık prop tipi
+interface ButtonProps {
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost'
+  size?: 'xs' | 'sm' | 'md' | 'lg'
+  loading?: boolean
+  children: React.ReactNode
+  onClick?: () => void
+}
+export function Button({ variant = 'primary', size = 'md', ...props }: ButtonProps) { ... }
+
+// YANLIŞ — isimsiz export, tip yok
+export default ({ children, ...props }) => { ... }
+```
+
+### API Routes
+```typescript
+// DAIMA: tip güvenli request/response
+// DAIMA: try/catch ile hata yönetimi
+// DAIMA: auth kontrolü başta
+export async function POST(req: Request) {
+  try {
+    const supabase = createServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return Response.json({ error: 'Yetkisiz erişim' }, { status: 401 })
+
+    const body = await req.json()
+    // ... işlem
+    return Response.json({ data: result })
+  } catch (error) {
+    console.error('[API] Hata:', error)
+    return Response.json({ error: 'Sunucu hatası' }, { status: 500 })
+  }
+}
+```
+
+### Supabase Sorguları
+```typescript
+// DAIMA: .select() ile sütun belirt (SELECT * KULLANMA)
+// DAIMA: hata kontrolü yap
+const { data, error } = await supabase
+  .from('blueprints')
+  .select('id, title, score_total, created_at')
+  .eq('user_id', user.id)
+  .order('created_at', { ascending: false })
+
+if (error) throw new Error(error.message)
+```
+
+### Claude API Çağrıları
+```typescript
+// DAIMA: streaming kullan (uzun üretimler için)
+// DAIMA: structured output için JSON prompt
+// DAIMA: token kullanımını logla
+const stream = await anthropic.messages.stream({
+  model: 'claude-sonnet-4-6',
+  max_tokens: 8192,
+  system: SYSTEM_PROMPT,
+  messages: [{ role: 'user', content: prompt }]
+})
+```
+
+---
+
+## 6. UI REFERANS DOSYALARI
+
+Elimizde pixel-perfect HTML referans dosyaları var. Her sayfa için bunları baz al:
+- /ui-reference/systemmd-landing.html       → Landing page
+- /ui-reference/systemmd-dashboard.html     → Dashboard
+- /ui-reference/systemmd-idea-generator.html → Fikir üreteci
+- /ui-reference/systemmd-blueprint-library.html → Kütüphane
+- /ui-reference/systemmd-build-center.html  → Build center
+- /ui-reference/systemmd-deployments.html   → Dağıtımlar
+- /ui-reference/systemmd-database.html      → Veritabanı konsolu
+- /ui-reference/systemmd-analytics.html     → Analitik
+- /ui-reference/systemmd-settings.html      → Ayarlar
+- /ui-reference/systemmd-billing.html       → Faturalama
+
+HTML → React dönüşümünde:
+- Renk değerlerini CSS değişkenlerine çevir
+- Inline style → Tailwind class
+- JavaScript → React hook/state
+- Animasyon → Framer Motion veya CSS transition
+- Tasarımı, aralıkları ve renkleri AYNEN koru
+
+---
+
+## 7. VERİTABANI KURALLARI
+
+- DAIMA Row Level Security (RLS) etkin
+- Policies: kullanıcılar yalnızca kendi verilerini görür
+- Foreign key: her zaman ON DELETE CASCADE
+- Timestamps: created_at + updated_at (trigger ile otomatik)
+- UUID: gen_random_uuid() ile üret
+- Index: sık sorgulanan sütunlara ekle (user_id, status, created_at)
+
+---
+
+## 8. GÜVENLİK KURALLARI
+
+- API anahtarları: DAIMA server-side, asla client'a gönderme
+- Input temizleme: her kullanıcı girdisini doğrula (Zod)
+- Rate limiting: AI endpoint'leri için plan bazlı limit uygula
+- CSRF koruması: Next.js built-in + Supabase session
+- Stripe webhook: imzayı her zaman doğrula
+
+---
+
+## 9. HATA YÖNETİMİ
+
+```typescript
+// Her UI durumu için: yükleniyor + hata + boş + içerik
+if (loading) return <SkeletonCard />
+if (error) return <ErrorState message={error.message} onRetry={refetch} />
+if (!data?.length) return <EmptyState title="Henüz blueprint yok" action={<NewBlueprintButton />} />
+return <BlueprintList items={data} />
+```
+
+---
+
+## 10. PERFORMANS KURALLARI
+
+- Server Component: veri fetch işlemleri (async/await)
+- Client Component: yalnızca etkileşim ve state gerektiğinde ('use client')
+- Görsel optimizasyon: next/image DAIMA
+- Dinamik import: ağır bileşenler için (grafik kütüphaneleri)
+- Prefetch: Link bileşeni ile prefetch={true}
+
+---
+
+## 11. GELİŞTİRME SIRASI
+
+Her özelliği bu sırayla geliştir:
+1. Veritabanı şeması ve migration
+2. TypeScript tipleri (types/ klasörü)
+3. API route (backend)
+4. Custom hook (veri yönetimi)
+5. UI bileşeni (HTML referansından dönüştür)
+6. Sayfa entegrasyonu
+7. Hata + yükleme + boş durumları
+8. Test
+
+## 13. FİYATLANDIRMA PLANLARI
+
+| Plan | İsim     | Token/ay  | Blueprint  | Fiyat   |
+|------|----------|-----------|-----------|---------|
+| free | Ücretsiz | 100k      | 10         | $0      |
+| pro  | Pro      | 1M        | Sınırsız  | $19/ay  |
+| team | Ekip     | 5M        | Sınırsız  | $49/ay  |
+
+- Plan tipi: `'free' | 'pro' | 'team'` — ASLA `solo`, `agency`, `starter` veya başka isim kullanma
+- DB enum: `plan_type` — aynı değerler
+- Webhook'ta plan cast: `(plan === 'pro' || plan === 'team') ? plan : 'free'`
+
+
+```
+feat: yeni özellik ekle
+fix: hata düzelt
+ui: görsel değişiklik
+api: backend değişikliği
+db: veritabanı değişikliği
+refactor: yeniden yapılandırma
+test: test ekle
+docs: döküman güncelle
+```
