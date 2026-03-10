@@ -406,63 +406,95 @@ export default function GeneratePage() {
     <div
       data-full-bleed
       className="flex flex-col overflow-hidden"
-      style={{ height: 'calc(100vh - 56px)' }}
+      style={{ height: 'calc(100vh - 52px)' }}
     >
       {/* Page Header */}
-      <div
-        className="flex items-center justify-between px-7 pt-5 pb-4 flex-shrink-0"
-      >
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '18px 28px 16px',
+        flexShrink: 0,
+        borderBottom: '1px solid var(--border)',
+        background: 'var(--bg-2)',
+      }}>
         <div>
-          <div className="text-[18px] font-semibold text-[var(--text)] tracking-[-0.02em]">
+          <h1 style={{
+            fontFamily: 'var(--font-serif)',
+            fontSize: 26,
+            fontWeight: 400,
+            letterSpacing: '-0.02em',
+            lineHeight: 1.1,
+            color: 'var(--text)',
+          }}>
             Idea Generator
-          </div>
-          <div className="text-[12px] text-[var(--text-3)] mt-[3px]">
+          </h1>
+          <p style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 4, lineHeight: 1.5 }}>
             Describe your startup idea — AI builds a complete blueprint.
-          </div>
+          </p>
         </div>
-        <div className="flex items-center gap-3">
-          {/* Usage counter */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {usage && (
-            <div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full border"
-              style={{
-                fontFamily: "'Geist Mono',monospace",
-                fontSize: '11px',
-                background: 'var(--bg-2)',
-                borderColor: usage.isAtLimit ? 'var(--red)' : 'var(--border)',
-              }}
-            >
-              <div
-                className="w-1.5 h-1.5 rounded-full"
-                style={{ background: usage.isAtLimit ? 'var(--red)' : usage.remaining <= 3 ? 'var(--yellow)' : 'var(--green)' }}
-              />
-              <span style={{ color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '9px' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 7,
+              padding: '5px 12px',
+              borderRadius: 99,
+              border: `1px solid ${usage.isAtLimit ? 'var(--red)' : 'var(--border)'}`,
+              background: 'var(--bg-3)',
+              fontFamily: 'var(--font-mono)',
+            }}>
+              <div style={{
+                width: 6, height: 6, borderRadius: '50%',
+                background: usage.isAtLimit ? 'var(--red)' : usage.remaining <= 3 ? 'var(--yellow)' : 'var(--green)',
+                flexShrink: 0,
+              }} />
+              <span style={{ fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 {usage.plan}
               </span>
-              <span style={{ color: usage.isAtLimit ? 'var(--red)' : usage.remaining <= 3 ? 'var(--yellow)' : 'var(--text-2)' }}>
+              <span style={{ fontSize: 11, fontWeight: 600, color: usage.isAtLimit ? 'var(--red)' : usage.remaining <= 3 ? 'var(--yellow)' : 'var(--text)' }}>
                 {usage.remaining}/{usage.limit}
               </span>
-              <span style={{ color: 'var(--text-4)' }}>generates left</span>
+              <span style={{ fontSize: 10, color: 'var(--text-3)' }}>left</span>
             </div>
           )}
           {blueprintResult && (
-          <Link
-            href="/library"
-            className="flex items-center gap-[6px] px-[14px] py-[6px] text-[12px] font-medium text-[var(--text-2)] border border-[var(--border-2)] rounded-[8px] hover:bg-[var(--bg-3)] hover:text-[var(--text)] transition-all duration-[140ms]"
-          >
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M2 3h12M2 8h8M2 13h10" />
-            </svg>
-            view library
-          </Link>
+            <Link
+              href="/library"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '7px 14px',
+                fontSize: 12, fontWeight: 500,
+                color: 'var(--text-2)',
+                border: '1px solid var(--border-2)',
+                borderRadius: 8,
+                textDecoration: 'none',
+                transition: 'all 120ms',
+                background: 'transparent',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.background = 'var(--bg-3)'
+                ;(e.currentTarget as HTMLElement).style.color = 'var(--text)'
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.background = 'transparent'
+                ;(e.currentTarget as HTMLElement).style.color = 'var(--text-2)'
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M2 3h12M2 8h8M2 13h10" />
+              </svg>
+              View Library
+            </Link>
           )}
         </div>
       </div>
 
       {/* Two Column Layout */}
       <div
-        className="flex flex-1 overflow-hidden border-t min-h-0"
-        style={{ borderColor: 'var(--border)' }}
+        className="flex flex-1 overflow-hidden min-h-0"
+        style={{ borderTop: 'none' }}
       >
         {/* ── Left panel: input ── */}
         <InputPanel

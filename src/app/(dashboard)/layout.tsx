@@ -52,8 +52,10 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
       <div className="flex-1 flex flex-col overflow-hidden min-w-0 w-full">
         <Topbar user={user} />
 
-        <main className="flex-1 overflow-y-auto overflow-x-hidden bg-[var(--bg)] p-4 md:p-7 [&:has([data-full-bleed])]:p-0 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[var(--border-2)] [&::-webkit-scrollbar-thumb]:rounded-full">
-          {children}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden bg-[var(--bg)] [&:has([data-full-bleed])]:p-0 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[var(--border-2)] [&::-webkit-scrollbar-thumb]:rounded-full">
+          <div className="[&:not(:has([data-full-bleed]))]:max-w-[860px] [&:not(:has([data-full-bleed]))]:mx-auto [&:not(:has([data-full-bleed]))]:px-8 [&:not(:has([data-full-bleed]))]:py-8">
+            {children}
+          </div>
         </main>
       </div>
 

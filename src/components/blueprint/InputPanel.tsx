@@ -48,11 +48,27 @@ const MODELS = [
   { value: 'power', label: 'Claude Opus 4 — powerful' },
 ]
 
+/* ── Field label ────────────────────────────────────────────────────────── */
+function Label({ children }: { children: React.ReactNode }) {
+  return (
+    <label style={{
+      fontFamily: 'var(--font-mono)',
+      fontSize: 10,
+      fontWeight: 600,
+      textTransform: 'uppercase' as const,
+      letterSpacing: '0.1em',
+      color: 'var(--text-2)',
+    }}>
+      {children}
+    </label>
+  )
+}
+
 export default function InputPanel({
   onGenerate,
   isGenerating,
   tokenUsagePercent = 0,
-  tokenUsageLabel = '0% / 100k',
+  tokenUsageLabel = '0%',
   onClear,
 }: InputPanelProps) {
   const [ideaText, setIdeaText] = useState('')
@@ -64,9 +80,7 @@ export default function InputPanel({
   const [ideaError, setIdeaError] = useState(false)
 
   const toggleFocus = (item: string) => {
-    setFocus((prev) =>
-      prev.includes(item) ? prev.filter((f) => f !== item) : [...prev, item]
-    )
+    setFocus(prev => prev.includes(item) ? prev.filter(f => f !== item) : [...prev, item])
   }
 
   const handleClear = () => {
@@ -86,113 +100,159 @@ export default function InputPanel({
     onGenerate({ idea_text: ideaText, description, industry, stage, focus, model })
   }
 
-  return (
-    <div className="border-r border-[var(--border)] flex flex-col overflow-hidden bg-[var(--bg-2)]" style={{ width: 380, minWidth: 380 }}>
+  const inputBase: React.CSSProperties = {
+    width: '100%',
+    background: 'var(--bg-3)',
+    border: '1px solid var(--border-2)',
+    borderRadius: 9,
+    padding: '10px 12px',
+    fontSize: 13,
+    color: 'var(--text)',
+    outline: 'none',
+    transition: 'border-color 140ms, box-shadow 140ms',
+    fontFamily: 'inherit',
+  }
 
-      {/* Panel Header */}
-      <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between flex-shrink-0">
-        <div className="flex items-center gap-[7px]">
-          <div className="w-[5px] h-[5px] rounded-full bg-[var(--accent)]" />
-          <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '10px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-3)' }}>
-            input
+  return (
+    <div style={{
+      width: 'clamp(320px, 32%, 420px)',
+      minWidth: 320,
+      borderRight: '1px solid var(--border)',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden',
+      background: 'var(--bg-2)',
+      flexShrink: 0,
+    }}>
+
+      {/* ── Header ── */}
+      <div style={{
+        padding: '14px 20px',
+        borderBottom: '1px solid var(--border)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexShrink: 0,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', flexShrink: 0 }} />
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-2)' }}>
+            Input
           </span>
         </div>
         <button
           onClick={handleClear}
           disabled={isGenerating}
-          className="disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-[120ms] hover:bg-[var(--bg-3)] hover:text-[var(--text-2)]"
-          style={{ fontFamily: "'Geist Mono', monospace", fontSize: '10px', color: 'var(--text-3)', border: '1px solid var(--border-2)', borderRadius: '6px', background: 'transparent', padding: '2px 8px', cursor: 'pointer' }}
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 10,
+            color: 'var(--text-3)',
+            border: '1px solid var(--border)',
+            borderRadius: 6,
+            background: 'transparent',
+            padding: '3px 10px',
+            cursor: isGenerating ? 'not-allowed' : 'pointer',
+            opacity: isGenerating ? 0.4 : 1,
+            transition: 'all 120ms',
+          }}
+          onMouseEnter={e => { if (!isGenerating) (e.currentTarget as HTMLElement).style.background = 'var(--bg-3)' }}
+          onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
         >
           clear
         </button>
       </div>
 
-      {/* Panel Body */}
-      <div className="flex-1 overflow-y-auto px-5 py-5 flex flex-col gap-4 [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:bg-[var(--border-2)]">
+      {/* ── Body ── */}
+      <div style={{
+        flex: 1,
+        overflowY: 'auto',
+        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 18,
+      }}>
 
         {/* Idea */}
-        <div className="flex flex-col gap-[6px]">
-          <label className="font-mono text-[9px] font-medium text-[var(--text-3)] tracking-[0.12em] uppercase">
-            idea *
-          </label>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <Label>Idea *</Label>
           <input
             type="text"
             value={ideaText}
-            onChange={(e) => setIdeaText(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+            onChange={e => setIdeaText(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleSubmit()}
             placeholder="e.g. AI invoicing tool for freelancers"
             disabled={isGenerating}
-            className={clsx(
-              'w-full px-3 py-[10px] bg-[var(--bg-3)] border rounded-[8px] text-[13px] font-sans text-[var(--text)] outline-none transition-all duration-[140ms] placeholder:text-[var(--text-4)] disabled:opacity-50',
-              ideaError
-                ? 'border-[var(--red)] shadow-[0_0_0_3px_var(--red-dim)]'
-                : 'border-[var(--border-2)] focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-dim)]'
-            )}
+            style={{
+              ...inputBase,
+              borderColor: ideaError ? 'var(--red)' : undefined,
+              boxShadow: ideaError ? '0 0 0 3px var(--red-dim)' : undefined,
+            }}
+            className="focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-dim)] placeholder:text-[var(--text-4)] disabled:opacity-50"
           />
-          <span className="text-[11px] text-[var(--text-3)] leading-[1.5]">
-            Describe what your startup does in one clear sentence.
+          <span style={{ fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5 }}>
+            One sentence — what does it do and for whom?
           </span>
         </div>
 
         {/* Context */}
-        <div className="flex flex-col gap-[6px]">
-          <label className="font-mono text-[9px] font-medium text-[var(--text-3)] tracking-[0.12em] uppercase">
-            context
-          </label>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <Label>Context</Label>
           <textarea
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="target market, problem, revenue ideas..."
+            onChange={e => setDescription(e.target.value)}
+            placeholder="Target market, core problem, revenue ideas..."
             disabled={isGenerating}
             rows={3}
-            className="w-full px-3 py-[10px] bg-[var(--bg-3)] border border-[var(--border-2)] rounded-[8px] text-[13px] font-sans text-[var(--text)] outline-none resize-none transition-all duration-[140ms] placeholder:text-[var(--text-4)] leading-[1.65] focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-dim)] disabled:opacity-50"
+            style={{ ...inputBase, resize: 'none', lineHeight: 1.65 }}
+            className="focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-dim)] placeholder:text-[var(--text-4)] disabled:opacity-50"
           />
         </div>
 
         {/* Industry */}
-        <div className="flex flex-col gap-[6px]">
-          <label className="font-mono text-[9px] font-medium text-[var(--text-3)] tracking-[0.12em] uppercase">
-            industry
-          </label>
-          <div className="relative">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <Label>Industry</Label>
+          <div style={{ position: 'relative' }}>
             <select
               value={industry}
-              onChange={(e) => setIndustry(e.target.value)}
+              onChange={e => setIndustry(e.target.value)}
               disabled={isGenerating}
-              className="w-full px-3 py-[10px] pr-8 bg-[var(--bg-3)] border border-[var(--border-2)] rounded-[8px] text-[13px] font-sans text-[var(--text)] outline-none cursor-pointer appearance-none transition-all duration-[140ms] focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-dim)] disabled:opacity-50"
+              style={{ ...inputBase, paddingRight: 32, cursor: 'pointer', appearance: 'none' }}
+              className="focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-dim)] disabled:opacity-50"
             >
-              {INDUSTRIES.map((ind) => (
-                <option key={ind.value} value={ind.value} className="bg-[var(--bg-3)]">
-                  {ind.label}
-                </option>
+              {INDUSTRIES.map(ind => (
+                <option key={ind.value} value={ind.value}>{ind.label}</option>
               ))}
             </select>
-            <svg
-              className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text-3)]"
-              width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"
-            >
+            <svg style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-3)' }}
+              width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M4 6l4 4 4-4" />
             </svg>
           </div>
         </div>
 
         {/* Stage */}
-        <div className="flex flex-col gap-[6px]">
-          <label className="font-mono text-[9px] font-medium text-[var(--text-3)] tracking-[0.12em] uppercase">
-            stage
-          </label>
-          <div className="flex flex-wrap gap-[6px]">
-            {STAGES.map((s) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <Label>Stage</Label>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {STAGES.map(s => (
               <button
                 key={s.value}
                 onClick={() => setStage(s.value)}
                 disabled={isGenerating}
-                className={clsx(
-                  'inline-flex items-center gap-[5px] px-[10px] py-1 rounded-[20px] text-[11px] border cursor-pointer transition-all duration-[120ms] font-mono disabled:opacity-50 disabled:cursor-not-allowed',
-                  stage === s.value
-                    ? 'border-[var(--accent)] text-[var(--accent)] bg-[var(--accent-dim)]'
-                    : 'border-[var(--border-2)] text-[var(--text-3)] bg-transparent hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--accent-dim)]'
-                )}
+                style={{
+                  padding: '5px 14px',
+                  borderRadius: 20,
+                  fontSize: 11,
+                  fontFamily: 'var(--font-mono)',
+                  fontWeight: 500,
+                  border: '1px solid',
+                  cursor: isGenerating ? 'not-allowed' : 'pointer',
+                  transition: 'all 120ms',
+                  background: stage === s.value ? 'var(--accent-dim)' : 'transparent',
+                  borderColor: stage === s.value ? 'var(--accent)' : 'var(--border-2)',
+                  color: stage === s.value ? 'var(--accent)' : 'var(--text-2)',
+                  opacity: isGenerating ? 0.5 : 1,
+                }}
               >
                 {s.label}
               </button>
@@ -201,100 +261,155 @@ export default function InputPanel({
         </div>
 
         {/* Focus */}
-        <div className="flex flex-col gap-[6px]">
-          <label className="font-mono text-[9px] font-medium text-[var(--text-3)] tracking-[0.12em] uppercase">
-            focus
-          </label>
-          <div className="flex flex-wrap gap-[6px]">
-            {FOCUS_OPTIONS.map((item) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <Label>Focus</Label>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {FOCUS_OPTIONS.map(item => (
               <button
                 key={item}
                 onClick={() => toggleFocus(item)}
                 disabled={isGenerating}
-                className={clsx(
-                  'inline-flex items-center gap-[5px] px-[10px] py-1 rounded-[20px] text-[11px] border cursor-pointer transition-all duration-[120ms] font-mono disabled:opacity-50 disabled:cursor-not-allowed',
-                  focus.includes(item)
-                    ? 'border-[var(--accent)] text-[var(--accent)] bg-[var(--accent-dim)]'
-                    : 'border-[var(--border-2)] text-[var(--text-3)] bg-transparent hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--accent-dim)]'
-                )}
+                style={{
+                  padding: '5px 14px',
+                  borderRadius: 20,
+                  fontSize: 11,
+                  fontFamily: 'var(--font-mono)',
+                  fontWeight: 500,
+                  border: '1px solid',
+                  cursor: isGenerating ? 'not-allowed' : 'pointer',
+                  transition: 'all 120ms',
+                  background: focus.includes(item) ? 'var(--accent-dim)' : 'transparent',
+                  borderColor: focus.includes(item) ? 'var(--accent)' : 'var(--border-2)',
+                  color: focus.includes(item) ? 'var(--accent)' : 'var(--text-2)',
+                  opacity: isGenerating ? 0.5 : 1,
+                }}
               >
                 {item}
               </button>
             ))}
           </div>
-          <span className="text-[11px] text-[var(--text-3)] leading-[1.5]">
+          <span style={{ fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5 }}>
             Select sections to include in the blueprint.
           </span>
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-[var(--border)] -mx-5" />
+        <div style={{ height: 1, background: 'var(--border)', margin: '0 -20px' }} />
 
         {/* AI Model */}
-        <div className="flex flex-col gap-[6px]">
-          <label className="font-mono text-[9px] font-medium text-[var(--text-3)] tracking-[0.12em] uppercase">
-            model
-          </label>
-          <div className="relative">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <Label>AI Model</Label>
+          <div style={{ position: 'relative' }}>
             <select
               value={model}
-              onChange={(e) => setModel(e.target.value as 'standard' | 'power')}
+              onChange={e => setModel(e.target.value as 'standard' | 'power')}
               disabled={isGenerating}
-              className="w-full px-3 py-[10px] pr-8 bg-[var(--bg-3)] border border-[var(--border-2)] rounded-[8px] text-[13px] font-sans text-[var(--text)] outline-none cursor-pointer appearance-none transition-all duration-[140ms] focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-dim)] disabled:opacity-50"
+              style={{ ...inputBase, paddingRight: 32, cursor: 'pointer', appearance: 'none' }}
+              className="focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-dim)] disabled:opacity-50"
             >
-              {MODELS.map((m) => (
-                <option key={m.value} value={m.value} className="bg-[var(--bg-3)]">
-                  {m.label}
-                </option>
+              {MODELS.map(m => (
+                <option key={m.value} value={m.value}>{m.label}</option>
               ))}
             </select>
-            <svg
-              className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text-3)]"
-              width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"
-            >
+            <svg style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-3)' }}
+              width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M4 6l4 4 4-4" />
             </svg>
           </div>
         </div>
+
       </div>
 
-      {/* Panel Footer */}
-      <div className="px-5 py-4 border-t border-[var(--border)] flex-shrink-0 flex flex-col gap-[10px]">
-        {/* Token Usage */}
-        <div className="flex items-center justify-between font-mono text-[10px] text-[var(--text-3)]">
-          <span>token usage</span>
-          <div className="flex items-center gap-2">
-            <div className="w-20 h-[3px] bg-[var(--border-2)] rounded-full overflow-hidden">
-              <div
-                className="h-full bg-[var(--accent)] rounded-full transition-all duration-300"
-                style={{ width: `${Math.min(tokenUsagePercent, 100)}%` }}
-              />
+      {/* ── Footer ── */}
+      <div style={{
+        padding: '14px 20px',
+        borderTop: '1px solid var(--border)',
+        flexShrink: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+      }}>
+
+        {/* Token usage bar */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-3)' }}>
+            token usage
+          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 72, height: 3, background: 'var(--border-2)', borderRadius: 99, overflow: 'hidden' }}>
+              <div style={{
+                height: '100%',
+                width: `${Math.min(tokenUsagePercent, 100)}%`,
+                background: 'var(--accent)',
+                borderRadius: 99,
+                transition: 'width 300ms',
+              }} />
             </div>
-            <span>{tokenUsageLabel}</span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-3)' }}>
+              {tokenUsageLabel}
+            </span>
           </div>
         </div>
 
-        {/* Generate Button */}
+        {/* Generate button */}
         <button
           onClick={handleSubmit}
           disabled={isGenerating}
-          className={clsx(
-            'w-full py-[12px] px-4 rounded-[8px] text-[13px] font-semibold flex items-center justify-center gap-2 transition-all duration-[140ms]',
-            isGenerating
-              ? 'bg-[var(--bg-4)] text-[var(--text-3)] border border-[var(--border-2)] cursor-not-allowed'
-              : 'bg-[var(--accent)] text-white border-none cursor-pointer hover:bg-[#5558e8] hover:-translate-y-px hover:shadow-[0_4px_16px_rgba(99,102,241,0.3)] active:translate-y-0'
-          )}
-          style={{ fontFamily: "'Geist', system-ui, sans-serif" }}
+          style={{
+            width: '100%',
+            padding: '13px 16px',
+            borderRadius: 10,
+            fontSize: 13,
+            fontWeight: 600,
+            fontFamily: 'inherit',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            cursor: isGenerating ? 'not-allowed' : 'pointer',
+            transition: 'all 140ms ease',
+            border: 'none',
+            background: isGenerating ? 'var(--bg-4)' : 'var(--accent)',
+            color: isGenerating ? 'var(--text-3)' : 'white',
+            boxShadow: isGenerating ? 'none' : '0 2px 12px rgba(99,102,241,0.25)',
+          }}
+          onMouseEnter={e => {
+            if (!isGenerating) {
+              (e.currentTarget as HTMLElement).style.background = 'var(--accent-hover)'
+              ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
+              ;(e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(99,102,241,0.35)'
+            }
+          }}
+          onMouseLeave={e => {
+            if (!isGenerating) {
+              (e.currentTarget as HTMLElement).style.background = 'var(--accent)'
+              ;(e.currentTarget as HTMLElement).style.transform = 'none'
+              ;(e.currentTarget as HTMLElement).style.boxShadow = '0 2px 12px rgba(99,102,241,0.25)'
+            }
+          }}
         >
           {isGenerating ? (
             <>
-              <span className="w-3 h-3 border-[1.5px] border-[var(--text-4)] border-t-[var(--text-2)] rounded-full animate-spin" />
-              generating...
+              <span style={{
+                width: 13, height: 13,
+                borderRadius: '50%',
+                border: '1.5px solid var(--text-4)',
+                borderTopColor: 'var(--text-2)',
+                display: 'inline-block',
+                animation: 'spin 0.7s linear infinite',
+              }} />
+              Generating...
             </>
           ) : (
-            'generate blueprint →'
+            <>
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M9 1.5L4.5 8.5H8L7 14.5L12 7H8.5L9 1.5Z" />
+              </svg>
+              Generate Blueprint
+            </>
           )}
         </button>
+
       </div>
     </div>
   )

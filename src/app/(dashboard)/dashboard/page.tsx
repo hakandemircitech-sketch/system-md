@@ -125,7 +125,7 @@ function OnboardingView({ name, timeLabel }: { name: string | null; timeLabel: s
             <>Your workspace<br />is ready.</>
           )}
         </h1>
-        <p style={{ fontSize: 15, color: 'var(--text-3)', lineHeight: 1.75, maxWidth: 440 }}>
+        <p style={{ fontSize: 15, color: 'var(--text-2)', lineHeight: 1.75, maxWidth: 440 }}>
           Describe a startup idea — AI builds architecture, DB schema,
           and a Cursor build kit in under 60 seconds.
         </p>
@@ -173,7 +173,7 @@ function OnboardingView({ name, timeLabel }: { name: string | null; timeLabel: s
             <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 6, letterSpacing: '-0.01em' }}>
               {title}
             </div>
-            <div style={{ fontSize: 12, color: 'var(--text-3)', lineHeight: 1.65 }}>
+            <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.65 }}>
               {body}
             </div>
           </div>
@@ -443,7 +443,7 @@ function WorkspaceView({
                 {bp.score_total !== null ? <ScoreChip score={bp.score_total} /> : <span style={{ color: 'var(--text-4)', fontFamily: 'var(--font-mono)', fontSize: 11 }}>—</span>}
               </span>
               <StatusDot status={bp.status} />
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-4)', whiteSpace: 'nowrap' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-3)', whiteSpace: 'nowrap' }}>
                 {timeAgo(bp.created_at)}
               </span>
             </div>
