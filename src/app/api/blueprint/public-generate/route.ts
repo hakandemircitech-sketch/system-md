@@ -187,7 +187,6 @@ export async function POST(req: NextRequest) {
           .from('public_blueprints')
           .insert({
             email: `ip:${ip}`,
-            ip_address: ip,
             idea_text,
             status: 'generating',
           })
@@ -210,34 +209,25 @@ export async function POST(req: NextRequest) {
         let fullText = ''
         let chunkCount = 0
 
-        const timeoutId = setTimeout(() => {
-          send({ type: 'error', message: 'Generation timed out. Please try again.' })
-          controller.close()
-        }, 90000)
+        const claudeStream = getAnthropic().messages.stream({
+          model: modelId,
+          max_tokens: 8192,
+          system: BLUEPRINT_SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: userPrompt }],
+        })
 
-        try {
-          const claudeStream = getAnthropic().messages.stream({
-            model: modelId,
-            max_tokens: 8192,
-            system: BLUEPRINT_SYSTEM_PROMPT,
-            messages: [{ role: 'user', content: userPrompt }],
-          })
+        for await (const event of claudeStream) {
+          if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+            const chunk = event.delta.text
+            fullText += chunk
+            chunkCount++
+            send({ type: 'chunk', content: chunk })
 
-          for await (const event of claudeStream) {
-            if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-              const chunk = event.delta.text
-              fullText += chunk
-              chunkCount++
-              send({ type: 'chunk', content: chunk })
-
-              if (chunkCount % 20 === 0) {
-                const estimatedProgress = Math.min(Math.round((fullText.length / 6000) * 85), 85)
-                send({ type: 'progress', value: estimatedProgress })
-              }
+            if (chunkCount % 20 === 0) {
+              const estimatedProgress = Math.min(Math.round((fullText.length / 6000) * 85), 85)
+              send({ type: 'progress', value: estimatedProgress })
             }
           }
-        } finally {
-          clearTimeout(timeoutId)
         }
 
         send({ type: 'progress', value: 90 })
