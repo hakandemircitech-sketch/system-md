@@ -174,16 +174,15 @@ function Logo({ onClick }: { onClick?: () => void }) {
       style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
     >
       <Image
-        src="/logo-yatay.png"
-        alt="System-md"
-        width={1024}
-        height={571}
+        src="/logo-new.png"
+        alt="SystemMD"
+        width={512}
+        height={288}
         priority
         style={{
-          height: '28px',
+          height: '30px',
           width: 'auto',
           objectFit: 'contain',
-          mixBlendMode: 'multiply',
         }}
       />
     </Link>

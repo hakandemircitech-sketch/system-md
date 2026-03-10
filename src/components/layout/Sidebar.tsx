@@ -132,17 +132,17 @@ export default function Sidebar({ user }: SidebarProps) {
         borderBottom: '1px solid var(--border)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{
-            width: 28, height: 28,
-            background: 'var(--accent)',
-            borderRadius: 7,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-          }}>
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="white" strokeWidth="1.8">
-              <path d="M3 4h10M3 8h7M3 12h8" />
-            </svg>
-          </div>
+          <img
+            src="/logo-square.png"
+            alt="SystemMD"
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 7,
+              objectFit: 'cover',
+              flexShrink: 0,
+            }}
+          />
           <span style={{
             fontFamily: 'var(--font-mono)',
             fontSize: 13,
