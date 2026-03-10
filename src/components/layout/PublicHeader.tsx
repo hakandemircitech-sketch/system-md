@@ -5,8 +5,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 export default function PublicHeader() {
-  const [scrolled, setScrolled] = useState(false)
+  const [scrolled, setScrolled]     = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [theme, setTheme]           = useState<'light' | 'dark'>('light')
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20)
@@ -19,6 +20,13 @@ export default function PublicHeader() {
     return () => { document.body.style.overflow = '' }
   }, [mobileOpen])
 
+  // Tema değişince en yakın [data-theme] wrapper'ı güncelle
+  useEffect(() => {
+    const wrapper = document.querySelector('[data-theme]')
+    if (wrapper) wrapper.setAttribute('data-theme', theme)
+  }, [theme])
+
+  const toggleTheme = () => setTheme(t => t === 'light' ? 'dark' : 'light')
   const close = () => setMobileOpen(false)
 
   return (
@@ -44,40 +52,43 @@ export default function PublicHeader() {
         {/* Desktop nav */}
         <nav
           className="hidden md:flex"
-          style={{ alignItems: 'center', gap: '16px' }}
+          style={{ alignItems: 'center', gap: '12px' }}
         >
           <GhostLink href="#pricing">pricing</GhostLink>
           <GhostLink href="/auth/login">sign in</GhostLink>
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
           <FilledLink href="/auth/signup">start building →</FilledLink>
         </nav>
 
-        {/* Mobile hamburger */}
-        <button
-          className="md:hidden"
-          onClick={() => setMobileOpen(true)}
-          aria-label="Menüyü aç"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '32px',
-            height: '32px',
-            border: '1px solid var(--surface-line-strong)',
-            borderRadius: '6px',
-            background: 'none',
-            cursor: 'pointer',
-            flexShrink: 0,
-          }}
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path
-              d="M2 4h12M2 8h12M2 12h12"
-              stroke="var(--foreground)"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-          </svg>
-        </button>
+        {/* Mobile: tema toggle + hamburger */}
+        <div className="md:hidden" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
+          <button
+            onClick={() => setMobileOpen(true)}
+            aria-label="Menüyü aç"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '32px',
+              height: '32px',
+              border: '1px solid var(--surface-line-strong)',
+              borderRadius: '6px',
+              background: 'none',
+              cursor: 'pointer',
+              flexShrink: 0,
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path
+                d="M2 4h12M2 8h12M2 12h12"
+                stroke="var(--foreground)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        </div>
       </header>
 
       {/* Mobile overlay */}
@@ -176,6 +187,68 @@ function Logo({ onClick }: { onClick?: () => void }) {
         }}
       />
     </Link>
+  )
+}
+
+function ThemeToggle({ theme, onToggle }: { theme: 'light' | 'dark'; onToggle: () => void }) {
+  const isDark = theme === 'dark'
+  return (
+    <button
+      onClick={onToggle}
+      aria-label={isDark ? 'Açık temaya geç' : 'Koyu temaya geç'}
+      title={isDark ? 'Light mode' : 'Dark mode'}
+      style={{
+        position: 'relative',
+        display: 'inline-flex',
+        alignItems: 'center',
+        width: '52px',
+        height: '26px',
+        borderRadius: '999px',
+        border: '1px solid var(--surface-line-strong)',
+        background: isDark ? '#1a1a2e' : '#e8e6e0',
+        cursor: 'pointer',
+        padding: '3px',
+        transition: 'background 300ms ease, border-color 300ms ease',
+        flexShrink: 0,
+        outline: 'none',
+      }}
+    >
+      {/* Track icons */}
+      <span style={{
+        position: 'absolute',
+        left: '7px',
+        fontSize: '10px',
+        lineHeight: 1,
+        opacity: isDark ? 0 : 1,
+        transition: 'opacity 200ms ease',
+        pointerEvents: 'none',
+      }}>☀️</span>
+      <span style={{
+        position: 'absolute',
+        right: '7px',
+        fontSize: '10px',
+        lineHeight: 1,
+        opacity: isDark ? 1 : 0,
+        transition: 'opacity 200ms ease',
+        pointerEvents: 'none',
+      }}>🌙</span>
+      {/* Thumb */}
+      <span style={{
+        display: 'block',
+        width: '18px',
+        height: '18px',
+        borderRadius: '50%',
+        background: isDark ? '#6366f1' : '#ffffff',
+        boxShadow: isDark
+          ? '0 0 6px rgba(99,102,241,0.6)'
+          : '0 1px 4px rgba(0,0,0,0.18)',
+        transform: isDark ? 'translateX(26px)' : 'translateX(0)',
+        transition: 'transform 300ms cubic-bezier(0.34,1.56,0.64,1), background 300ms ease, box-shadow 300ms ease',
+        flexShrink: 0,
+        position: 'relative',
+        zIndex: 1,
+      }} />
+    </button>
   )
 }
 
