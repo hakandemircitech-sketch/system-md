@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import InputPanel, { type GenerateFormData } from '@/components/blueprint/InputPanel'
 import TerminalPanel from '@/components/blueprint/TerminalPanel'
-import ScoreRing from '@/components/blueprint/ScoreRing'
-import ScoreBars from '@/components/blueprint/ScoreBars'
 import SectionAccordion from '@/components/blueprint/SectionAccordion'
 import BuildKitPanel from '@/components/blueprint/BuildKitPanel'
 import { useBlueprintStore } from '@/stores/blueprintStore'
@@ -150,55 +148,132 @@ function ResultView({
     )
   }
 
+  const scoreColor = content.skor.toplam >= 85 ? '#22c55e' : content.skor.toplam >= 65 ? '#6366f1' : content.skor.toplam >= 45 ? '#eab308' : '#ef4444'
+  const scoreLabel = ({ 'ZAYIF': 'WEAK', 'ORTA': 'FAIR', 'GÜÇLÜ': 'STRONG', 'İSTİSNAİ': 'EXCEPTIONAL' } as Record<string, string>)[content.skor.etiket] ?? content.skor.etiket
+
+  const SUB_SCORES = [
+    { key: 'pazar' as const, label: 'Market', color: '#22c55e' },
+    { key: 'teknoloji' as const, label: 'Tech', color: '#6366f1' },
+    { key: 'gelir' as const, label: 'Revenue', color: '#eab308' },
+    { key: 'marka' as const, label: 'Brand', color: '#ec4899' },
+  ]
+
   return (
-    <>
-      {/* Right Header */}
-      <div
-        className="px-6 py-4 border-b flex items-center justify-between flex-shrink-0"
-        style={{ borderColor: 'var(--border)' }}
-      >
-        <div className="flex items-center gap-[7px]">
-          <div className="w-[5px] h-[5px] rounded-full" style={{ background: 'var(--green)' }} />
-          <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '10px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-3)' }}>
-            {result.title}
+    <div style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
+
+      {/* ── Left sidebar: score + actions ── */}
+      <div style={{
+        width: 200,
+        minWidth: 200,
+        borderRight: '1px solid var(--border)',
+        display: 'flex',
+        flexDirection: 'column',
+        overflowY: 'auto',
+        background: 'var(--bg-2)',
+        flexShrink: 0,
+      }}>
+        {/* Score hero */}
+        <div style={{ padding: '20px 16px', borderBottom: '1px solid var(--border)' }}>
+          <p style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-4)', marginBottom: 10 }}>
+            Blueprint Score
+          </p>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 40, fontWeight: 700, lineHeight: 1, color: scoreColor, letterSpacing: '-0.04em' }}>
+              {content.skor.toplam}
+            </span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-4)' }}>/100</span>
+          </div>
+          <div style={{ height: 4, background: 'var(--border-2)', borderRadius: 99, overflow: 'hidden', marginBottom: 8 }}>
+            <div style={{ height: '100%', width: `${content.skor.toplam}%`, background: scoreColor, borderRadius: 99 }} />
+          </div>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', padding: '3px 8px', borderRadius: 5, background: scoreColor + '18', color: scoreColor }}>
+            {scoreLabel}
           </span>
         </div>
-        <div className="flex items-center gap-2">
+
+        {/* Sub scores */}
+        <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
+          <p style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-4)', marginBottom: 12 }}>
+            Sub Scores
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {SUB_SCORES.map(({ key, label, color }) => (
+              <div key={key}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600, color }}>{content.skor[key]}</span>
+                </div>
+                <div style={{ height: 3, background: 'var(--border-2)', borderRadius: 99, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${content.skor[key]}%`, background: color, borderRadius: 99, transition: 'width 0.7s ease' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Blueprint title */}
+        <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
+          <p style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Project</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />
+            <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text)', lineHeight: 1.4 }}>{result.title}</span>
+          </div>
+        </div>
+
+        {/* Spacer */}
+        <div style={{ flex: 1 }} />
+
+        {/* Actions */}
+        <div style={{ padding: '12px', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <Link
+            href={`/generate/${result.id}`}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '7px 12px', fontSize: 11, fontWeight: 500, color: 'var(--text-2)', border: '1px solid var(--border)', borderRadius: 7, textDecoration: 'none', transition: 'all 120ms', background: 'transparent' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--bg-3)'; (e.currentTarget as HTMLElement).style.color = 'var(--text)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'var(--text-2)' }}
+          >
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M7 2H3a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1V9M10 2h4v4M6 10l8-8" />
+            </svg>
+            Full page
+          </Link>
           <button
             onClick={onRegenerateClick}
-            className="flex items-center gap-[6px] px-[10px] py-1 text-[11px] text-[var(--text-2)] border border-[var(--border-2)] rounded-[8px] hover:bg-[var(--bg-3)] hover:text-[var(--text)] transition-all duration-[140ms]"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '7px 12px', fontSize: 11, fontWeight: 500, color: 'var(--text-2)', border: '1px solid var(--border)', borderRadius: 7, cursor: 'pointer', transition: 'all 120ms', background: 'transparent' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--bg-3)'; (e.currentTarget as HTMLElement).style.color = 'var(--text)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'var(--text-2)' }}
           >
             <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M2 8a6 6 0 1112 0" /><path d="M14 4v4h-4" />
             </svg>
-            regenerate
+            Regenerate
           </button>
           <button
             onClick={onSaveToLibrary}
-            className="flex items-center gap-[6px] px-3 py-1 text-[11px] font-semibold text-white bg-[var(--accent)] rounded-[8px] border border-[var(--accent)] hover:bg-[#5558e8] transition-all duration-[140ms]"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 12px', fontSize: 11, fontWeight: 600, color: 'white', background: 'var(--accent)', border: 'none', borderRadius: 7, cursor: 'pointer', transition: 'all 120ms', boxShadow: '0 2px 8px rgba(99,102,241,0.25)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--accent-hover)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--accent)'; (e.currentTarget as HTMLElement).style.transform = 'none' }}
           >
             <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M3 2h8l3 3v9H2V2zM6 2v5h5" />
             </svg>
-            save to library
+            Save to Library
           </button>
         </div>
       </div>
 
-      {/* Right Body */}
-      <div
-        className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-[10px] bg-[var(--bg)] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-[var(--border-2)]"
+      {/* ── Right: accordion sections + build kit ── */}
+      <div style={{
+        flex: 1,
+        overflowY: 'auto',
+        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+        background: 'var(--bg)',
+      }}
+        className="[&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-[var(--border-2)] [&::-webkit-scrollbar-thumb]:rounded-full"
       >
-        {/* Score Ring */}
-        <ScoreRing skor={content.skor} animate />
-
-        {/* Score Bars */}
-        <ScoreBars skor={content.skor} animate />
-
-        {/* Section Accordion */}
         <SectionAccordion content={content} defaultOpen={['concept']} />
-
-        {/* Build Kit */}
         {result.build_kit && (
           <BuildKitPanel
             blueprintId={result.id}
@@ -209,41 +284,11 @@ function ResultView({
             readmeMd={result.build_kit.readme_md ?? undefined}
           />
         )}
+        {/* Bottom padding */}
+        <div style={{ height: 20 }} />
       </div>
 
-      {/* Save Bar */}
-      <div
-        className="px-6 py-3 border-t flex items-center justify-between flex-shrink-0"
-        style={{ borderColor: 'var(--border)', background: 'var(--bg-2)' }}
-      >
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[11px] text-[var(--text-3)]">blueprint ready</span>
-          <span className="font-mono text-[11px] font-medium" style={{ color: 'var(--green)' }}>
-            · score: {content.skor.toplam}/100
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href={`/generate/${result.id}`}
-            className="flex items-center gap-[6px] px-3 py-[5px] text-[11px] text-[var(--text-2)] border border-[var(--border-2)] rounded-[8px] hover:bg-[var(--bg-3)] hover:text-[var(--text)] transition-all duration-[140ms]"
-          >
-            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M7 2H3a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1V9M10 2h4v4M6 10l8-8" />
-            </svg>
-            open full page
-          </Link>
-          <button
-            onClick={onSaveToLibrary}
-            className="flex items-center gap-[6px] px-3 py-[5px] text-[11px] font-semibold text-white bg-[var(--accent)] rounded-[8px] hover:bg-[#5558e8] transition-all duration-[140ms]"
-          >
-            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M3 2h8l3 3v9H2V2zM6 2v5h5" />
-            </svg>
-            save to library
-          </button>
-        </div>
-      </div>
-    </>
+    </div>
   )
 }
 

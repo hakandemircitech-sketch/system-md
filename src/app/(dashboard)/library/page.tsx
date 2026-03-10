@@ -11,8 +11,6 @@ import type { Blueprint } from '@/types/blueprint'
 import type { BlueprintContent } from '@/types/blueprint'
 import { useBlueprints, useDeleteBlueprint } from '@/hooks/useBlueprint'
 import { ErrorState } from '@/components/ui/ErrorState'
-import { EmptyState } from '@/components/ui/EmptyState'
-
 // ─── Tipler ──────────────────────────────────────────────────────────────────
 
 type ViewMode = 'grid' | 'list'
@@ -205,23 +203,48 @@ function CardSkeleton() {
 function EmptyStateWrapper({ hasSearch }: { hasSearch: boolean }) {
   if (hasSearch) {
     return (
-      <div className="col-span-3">
-        <EmptyState
-          title="No results found"
-          description="No blueprints match your search. Clear filters and try again."
-          variant="full"
-        />
+      <div className="col-span-3 flex flex-col items-center justify-center py-24 text-center">
+        <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--bg-3)', border: '1px solid var(--border-2)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, color: 'var(--text-3)' }}>
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <circle cx="6.5" cy="6.5" r="4.5" /><path d="M10 10l3.5 3.5" />
+          </svg>
+        </div>
+        <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', marginBottom: 6 }}>No results found</p>
+        <p style={{ fontSize: 12, color: 'var(--text-3)', maxWidth: 260, lineHeight: 1.65 }}>
+          No blueprints match your search criteria. Try adjusting your filters.
+        </p>
       </div>
     )
   }
   return (
-    <div className="col-span-3">
-      <EmptyState
-        title="No blueprints yet"
-        description="Use Idea Generator to create your first blueprint."
-        action={{ label: 'New Blueprint', href: '/generate' }}
-        variant="full"
-      />
+    <div className="col-span-3 flex flex-col items-center justify-center py-24 text-center">
+      {/* Decorative grid of placeholder cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 88px)', gap: 8, marginBottom: 28, opacity: 0.4 }}>
+        {[...Array(6)].map((_, i) => (
+          <div key={i} style={{ height: 60, borderRadius: 8, background: 'var(--bg-3)', border: '1px solid var(--border)', overflow: 'hidden' }}>
+            <div style={{ height: 2, background: ['#6366f1','#22c55e','#eab308','#ec4899','#3b82f6','#14b8a6'][i] }} />
+          </div>
+        ))}
+      </div>
+      <div style={{ marginBottom: 12 }}>
+        <p style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 400, letterSpacing: '-0.02em', color: 'var(--text)', lineHeight: 1.2, marginBottom: 8 }}>
+          Your library is empty
+        </p>
+        <p style={{ fontSize: 13, color: 'var(--text-3)', maxWidth: 300, lineHeight: 1.7, margin: '0 auto' }}>
+          Generate your first blueprint — AI will build architecture, DB schema, and a full build kit in under 60 seconds.
+        </p>
+      </div>
+      <Link
+        href="/generate"
+        style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 18px', background: 'var(--accent)', color: 'white', borderRadius: 8, fontSize: 12, fontWeight: 500, textDecoration: 'none', boxShadow: '0 2px 12px rgba(99,102,241,0.3)', marginTop: 4, transition: 'all 150ms' }}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 16px rgba(99,102,241,0.35)' }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 12px rgba(99,102,241,0.3)' }}
+      >
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M8 3v10M3 8h10" />
+        </svg>
+        Generate First Blueprint
+      </Link>
     </div>
   )
 }
