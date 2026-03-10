@@ -22,12 +22,28 @@ const instrumentSerif = Instrument_Serif({
 
 export const metadata: Metadata = {
   title: {
-    default: 'SystemMD — Turn Ideas into Shippable Products',
+    default: 'SystemMD — AI Blueprint Generator for Developers & Indie Hackers',
     template: '%s | SystemMD',
   },
   description:
-    "Turn startup ideas into AI blueprints in 60 seconds. Tech stack, DB schema, Cursor build kit — all included.",
-  keywords: ['startup', 'ai', 'blueprint', 'saas', 'claude', 'anthropic', 'systemmd', 'cursor', 'nextjs'],
+    'Turn your app idea into a production-ready blueprint in seconds. Get tech stack, database schema, API design, file structure and revenue model — free, no sign-up required. Download as ZIP.',
+  keywords: [
+    'ai blueprint generator',
+    'software architecture generator',
+    'ai project planner',
+    'generate software architecture from idea',
+    'startup tech stack generator',
+    'ai tools for developers',
+    'indie hacker tools',
+    'project blueprint ai',
+    'api design generator',
+    'database schema generator',
+    'cursor ai build kit',
+    'nextjs project generator',
+    'saas blueprint',
+    'free ai developer tool',
+    'systemmd',
+  ],
   metadataBase: new URL('https://system-md.com'),
   icons: {
     icon: '/icon',
@@ -35,26 +51,48 @@ export const metadata: Metadata = {
     shortcut: '/icon',
   },
   applicationName: 'SystemMD',
+  authors: [{ name: 'SystemMD', url: 'https://system-md.com' }],
+  creator: 'SystemMD',
+  publisher: 'SystemMD',
+  category: 'Developer Tools',
   openGraph: {
-    title: 'SystemMD — Turn Ideas into Shippable Products',
+    title: 'SystemMD — AI Blueprint Generator for Developers',
     description:
-      "Turn startup ideas into AI blueprints in 60 seconds. Tech stack, DB schema, Cursor build kit — all included.",
+      'Turn your app idea into a production-ready blueprint in seconds. Tech stack, DB schema, API design, file structure — free, no sign-up. Download as ZIP.',
     type: 'website',
     url: 'https://system-md.com',
+    siteName: 'SystemMD',
+    locale: 'en_US',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'SystemMD — Turn Ideas into Shippable Products',
+        alt: 'SystemMD — AI Blueprint Generator for Developers',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SystemMD — Turn Ideas into Shippable Products',
-    description: "Turn startup ideas into AI blueprints in 60 seconds.",
+    title: 'SystemMD — AI Blueprint Generator for Developers',
+    description:
+      'Turn your app idea into a production-ready blueprint in seconds. Free, no sign-up. Download as ZIP.',
     images: ['/og-image.png'],
+    creator: '@systemmd',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: 'https://system-md.com',
   },
 }
 
