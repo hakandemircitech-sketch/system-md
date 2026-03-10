@@ -248,16 +248,40 @@ export default function LandingClient() {
           }}>
             {[...Array(2)].map((_, duplication) => (
               <span key={duplication} style={{ display: 'inline-flex', alignItems: 'center', gap: 0 }}>
-                {[
-                  { icon: '⚡', text: 'No sign-up required', accent: true },
-                  { icon: '🆓', text: 'Completely free', accent: false },
-                  { icon: '📦', text: 'Download as ZIP', accent: false },
-                  { icon: '🚀', text: 'Blueprint in seconds', accent: true },
-                  { icon: '🔓', text: 'No credit card', accent: false },
-                  { icon: '🛠️', text: 'Real code architecture', accent: false },
-                  { icon: '✨', text: 'Powered by AI', accent: true },
-                  { icon: '💡', text: 'Idea in · blueprint out', accent: false },
-                ].map((item, i) => (
+                {([
+                  {
+                    text: 'No sign-up required', accent: true,
+                    svg: <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" style={{display:'inline-block',verticalAlign:'middle',marginRight:'7px',flexShrink:0}}><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 13c0-2.76 2.24-5 5-5s5 2.24 5 5"/><line x1="13" y1="6" x2="15" y2="8"/><line x1="15" y1="6" x2="13" y2="8"/></svg>,
+                  },
+                  {
+                    text: 'Completely free', accent: false,
+                    svg: <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" style={{display:'inline-block',verticalAlign:'middle',marginRight:'7px',flexShrink:0}}><rect x="1" y="4" width="14" height="10" rx="2"/><path d="M5 4V3a3 3 0 016 0v1"/><path d="M8 9v2"/></svg>,
+                  },
+                  {
+                    text: 'Download as ZIP', accent: false,
+                    svg: <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" style={{display:'inline-block',verticalAlign:'middle',marginRight:'7px',flexShrink:0}}><path d="M8 2v8m0 0L5 7m3 3l3-3"/><rect x="2" y="11" width="12" height="3" rx="1"/></svg>,
+                  },
+                  {
+                    text: 'Blueprint in seconds', accent: true,
+                    svg: <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" style={{display:'inline-block',verticalAlign:'middle',marginRight:'7px',flexShrink:0}}><circle cx="8" cy="8" r="6.5"/><polyline points="8,4.5 8,8 10.5,9.5"/></svg>,
+                  },
+                  {
+                    text: 'No credit card', accent: false,
+                    svg: <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" style={{display:'inline-block',verticalAlign:'middle',marginRight:'7px',flexShrink:0}}><rect x="1" y="3" width="14" height="10" rx="2"/><line x1="1" y1="7" x2="15" y2="7"/><line x1="2" y1="10" x2="6" y2="10"/><line x1="1" y1="3" x2="15" y2="13"/></svg>,
+                  },
+                  {
+                    text: 'Real code architecture', accent: false,
+                    svg: <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" style={{display:'inline-block',verticalAlign:'middle',marginRight:'7px',flexShrink:0}}><polyline points="4,5 1,8 4,11"/><polyline points="12,5 15,8 12,11"/><line x1="10" y1="3" x2="6" y2="13"/></svg>,
+                  },
+                  {
+                    text: 'Powered by AI', accent: true,
+                    svg: <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" style={{display:'inline-block',verticalAlign:'middle',marginRight:'7px',flexShrink:0}}><path d="M8 1l1.5 4.5H14l-3.75 2.75L11.5 13 8 10.25 4.5 13l1.25-4.75L2 5.5h4.5z"/></svg>,
+                  },
+                  {
+                    text: 'Idea in · blueprint out', accent: false,
+                    svg: <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" style={{display:'inline-block',verticalAlign:'middle',marginRight:'7px',flexShrink:0}}><circle cx="8" cy="6" r="3.5"/><path d="M8 9.5v2m-2 1.5h4"/><path d="M6 6a2 2 0 012-2"/></svg>,
+                  },
+                ] as { text: string; accent: boolean; svg: React.ReactNode }[]).map((item, i) => (
                   <span key={i} style={{ display: 'inline-flex', alignItems: 'center' }}>
                     <span style={{
                       fontFamily: "'Geist Mono', monospace",
@@ -266,8 +290,10 @@ export default function LandingClient() {
                       letterSpacing: '0.04em',
                       padding: '0 20px',
                       fontWeight: item.accent ? 600 : 400,
+                      display: 'inline-flex',
+                      alignItems: 'center',
                     }}>
-                      <span style={{ marginRight: '7px' }}>{item.icon}</span>
+                      {item.svg}
                       {item.text}
                     </span>
                     <span style={{ color: 'var(--border-2)', fontSize: '10px', userSelect: 'none' }}>·</span>
