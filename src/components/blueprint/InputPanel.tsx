@@ -20,47 +20,38 @@ interface InputPanelProps {
 }
 
 const INDUSTRIES = [
-  { value: '', label: 'Industry...' },
-  { value: 'saas', label: 'SaaS / B2B' },
+  { value: '', label: 'Select industry...' },
+  { value: 'saas', label: 'SaaS / B2B Software' },
   { value: 'fintech', label: 'FinTech' },
   { value: 'healthtech', label: 'HealthTech' },
   { value: 'edtech', label: 'EdTech' },
   { value: 'ecommerce', label: 'E-Commerce' },
   { value: 'logistics', label: 'Logistics' },
   { value: 'marketplace', label: 'Marketplace' },
-  { value: 'ai', label: 'AI / ML' },
-  { value: 'devtools', label: 'Dev Tools' },
+  { value: 'ai', label: 'AI / ML Tools' },
+  { value: 'devtools', label: 'Developer Tools' },
   { value: 'other', label: 'Other' },
 ]
 
-const STAGES: { value: GenerateFormData['stage']; label: string }[] = [
-  { value: 'idea', label: 'idea' },
-  { value: 'mvp', label: 'mvp' },
-  { value: 'growth', label: 'growth' },
-  { value: 'scale', label: 'scale' },
+const STAGES: { value: GenerateFormData['stage']; label: string; desc: string }[] = [
+  { value: 'idea', label: 'Idea', desc: 'Concept stage' },
+  { value: 'mvp', label: 'MVP', desc: 'Building v1' },
+  { value: 'growth', label: 'Growth', desc: 'Scaling up' },
+  { value: 'scale', label: 'Scale', desc: 'Enterprise' },
 ]
 
-const FOCUS_OPTIONS = ['architecture', 'database', 'business', 'marketing', 'brand']
+const FOCUS_OPTIONS = [
+  { key: 'architecture', label: 'Architecture' },
+  { key: 'database', label: 'Database' },
+  { key: 'business', label: 'Business' },
+  { key: 'marketing', label: 'Marketing' },
+  { key: 'brand', label: 'Brand' },
+]
 
 const MODELS = [
-  { value: 'standard', label: 'Sonnet 4.6' },
-  { value: 'power', label: 'Opus 4' },
+  { value: 'standard', label: 'Claude Sonnet 4.6', badge: 'recommended' },
+  { value: 'power', label: 'Claude Opus 4', badge: 'powerful' },
 ]
-
-const selectBase: React.CSSProperties = {
-  background: 'var(--bg-3)',
-  border: '1px solid var(--border-2)',
-  borderRadius: 8,
-  padding: '0 30px 0 10px',
-  height: 36,
-  fontSize: 12,
-  color: 'var(--text)',
-  outline: 'none',
-  cursor: 'pointer',
-  appearance: 'none',
-  fontFamily: 'inherit',
-  transition: 'border-color 140ms',
-}
 
 export default function InputPanel({
   onGenerate,
@@ -70,13 +61,13 @@ export default function InputPanel({
   onClear,
 }: InputPanelProps) {
   const [ideaText, setIdeaText] = useState('')
-  const [description, setDescription] = useState('')
   const [industry, setIndustry] = useState('')
   const [stage, setStage] = useState<GenerateFormData['stage']>('idea')
   const [focus, setFocus] = useState<string[]>(['architecture', 'database', 'business'])
   const [model, setModel] = useState<'standard' | 'power'>('standard')
   const [ideaError, setIdeaError] = useState(false)
-  const [expanded, setExpanded] = useState(false)
+
+  const wordCount = ideaText.trim().split(/\s+/).filter(Boolean).length
 
   const toggleFocus = (item: string) => {
     setFocus(prev => prev.includes(item) ? prev.filter(f => f !== item) : [...prev, item])
@@ -84,8 +75,6 @@ export default function InputPanel({
 
   const handleClear = () => {
     setIdeaText('')
-    setDescription('')
-    setIndustry('')
     setIdeaError(false)
     onClear?.()
   }
@@ -96,324 +85,365 @@ export default function InputPanel({
       setTimeout(() => setIdeaError(false), 1500)
       return
     }
-    onGenerate({ idea_text: ideaText, description, industry, stage, focus, model })
+    onGenerate({ idea_text: ideaText, description: '', industry, stage, focus, model })
+  }
+
+  const labelStyle: React.CSSProperties = {
+    fontFamily: 'var(--font-mono)',
+    fontSize: 9,
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    letterSpacing: '0.12em',
+    color: 'var(--text-4)',
+    marginBottom: 8,
+    display: 'block',
   }
 
   return (
     <div style={{
-      flexShrink: 0,
+      display: 'grid',
+      gridTemplateColumns: '1fr 280px',
+      flex: 1,
+      overflow: 'hidden',
+      minHeight: 0,
       borderBottom: '1px solid var(--border)',
-      background: 'var(--bg-2)',
-      display: 'flex',
-      flexDirection: 'column',
     }}>
 
-      {/* ── Row 1: Main input bar ── */}
+      {/* ── LEFT: idea textarea ── */}
       <div style={{
         display: 'flex',
-        alignItems: 'center',
-        gap: 10,
-        padding: '14px 20px',
-        borderBottom: expanded ? '1px solid var(--border)' : 'none',
+        flexDirection: 'column',
+        borderRight: '1px solid var(--border)',
+        background: 'var(--bg)',
+        overflow: 'hidden',
       }}>
-
-        {/* Idea input — takes remaining space */}
-        <div style={{ flex: 1, position: 'relative' }}>
-          <input
-            type="text"
-            value={ideaText}
-            onChange={e => setIdeaText(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-            placeholder="Describe your startup idea — e.g. AI invoicing tool for freelancers"
-            disabled={isGenerating}
-            style={{
-              width: '100%',
-              height: 38,
-              background: ideaError ? 'rgba(239,68,68,0.04)' : 'var(--bg-3)',
-              border: `1px solid ${ideaError ? 'var(--red)' : 'var(--border-2)'}`,
-              borderRadius: 9,
-              padding: '0 14px',
-              fontSize: 13,
-              color: 'var(--text)',
-              outline: 'none',
-              fontFamily: 'inherit',
-              transition: 'border-color 140ms, box-shadow 140ms',
-              boxShadow: ideaError ? '0 0 0 3px var(--red-dim)' : 'none',
-            }}
-            className="focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-dim)] placeholder:text-[var(--text-4)] disabled:opacity-50"
-          />
+        {/* Header */}
+        <div style={{
+          padding: '14px 24px',
+          borderBottom: '1px solid var(--border)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexShrink: 0,
+          background: 'var(--bg-2)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--accent)' }} />
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-3)' }}>
+              Your Idea
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-4)' }}>
+              {wordCount} words
+            </span>
+            {ideaText && (
+              <button
+                onClick={handleClear}
+                disabled={isGenerating}
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 10,
+                  color: 'var(--text-3)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 6,
+                  background: 'transparent',
+                  padding: '3px 10px',
+                  cursor: isGenerating ? 'not-allowed' : 'pointer',
+                  opacity: isGenerating ? 0.4 : 1,
+                  transition: 'all 120ms',
+                }}
+                onMouseEnter={e => { if (!isGenerating) (e.currentTarget as HTMLElement).style.background = 'var(--bg-3)' }}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+              >
+                clear
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Industry */}
-        <div style={{ position: 'relative', flexShrink: 0 }}>
-          <select
-            value={industry}
-            onChange={e => setIndustry(e.target.value)}
-            disabled={isGenerating}
-            style={{ ...selectBase, width: 120 }}
-            className="focus:border-[var(--accent)] disabled:opacity-50"
-          >
-            {INDUSTRIES.map(ind => (
-              <option key={ind.value} value={ind.value}>{ind.label}</option>
-            ))}
-          </select>
-          <svg style={{ position: 'absolute', right: 9, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-3)' }}
-            width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M4 6l4 4 4-4" />
-          </svg>
-        </div>
-
-        {/* Stage pills */}
-        <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-          {STAGES.map(s => (
-            <button
-              key={s.value}
-              onClick={() => setStage(s.value)}
-              disabled={isGenerating}
-              style={{
-                height: 28,
-                padding: '0 10px',
-                borderRadius: 6,
-                fontSize: 11,
-                fontFamily: 'var(--font-mono)',
-                fontWeight: 500,
-                border: '1px solid',
-                cursor: isGenerating ? 'not-allowed' : 'pointer',
-                transition: 'all 100ms',
-                background: stage === s.value ? 'var(--accent-dim)' : 'transparent',
-                borderColor: stage === s.value ? 'var(--accent)' : 'var(--border-2)',
-                color: stage === s.value ? 'var(--accent)' : 'var(--text-3)',
-                opacity: isGenerating ? 0.5 : 1,
-              }}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Model */}
-        <div style={{ position: 'relative', flexShrink: 0 }}>
-          <select
-            value={model}
-            onChange={e => setModel(e.target.value as 'standard' | 'power')}
-            disabled={isGenerating}
-            style={{ ...selectBase, width: 100 }}
-            className="focus:border-[var(--accent)] disabled:opacity-50"
-          >
-            {MODELS.map(m => (
-              <option key={m.value} value={m.value}>{m.label}</option>
-            ))}
-          </select>
-          <svg style={{ position: 'absolute', right: 9, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-3)' }}
-            width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M4 6l4 4 4-4" />
-          </svg>
-        </div>
-
-        {/* Expand toggle */}
-        <button
-          onClick={() => setExpanded(p => !p)}
-          title="More options"
-          style={{
-            width: 32, height: 32, borderRadius: 8,
-            border: `1px solid ${expanded ? 'var(--accent-border)' : 'var(--border-2)'}`,
-            background: expanded ? 'var(--accent-dim)' : 'transparent',
-            color: expanded ? 'var(--accent)' : 'var(--text-3)',
-            cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'all 120ms',
-            flexShrink: 0,
-          }}
-        >
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <circle cx="4" cy="8" r="1.2" fill="currentColor" stroke="none"/>
-            <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/>
-            <circle cx="12" cy="8" r="1.2" fill="currentColor" stroke="none"/>
-          </svg>
-        </button>
-
-        {/* Clear */}
-        {ideaText && (
-          <button
-            onClick={handleClear}
-            disabled={isGenerating}
-            title="Clear"
-            style={{
-              width: 28, height: 28, borderRadius: 6,
-              border: '1px solid var(--border)',
-              background: 'transparent',
-              color: 'var(--text-3)',
-              cursor: isGenerating ? 'not-allowed' : 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              opacity: isGenerating ? 0.4 : 1,
-              transition: 'all 120ms',
-              flexShrink: 0,
-            }}
-            onMouseEnter={e => { if (!isGenerating) (e.currentTarget as HTMLElement).style.background = 'var(--bg-3)' }}
-            onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
-          >
-            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M4 4l8 8M12 4l-8 8"/>
-            </svg>
-          </button>
-        )}
-
-        {/* Generate button */}
-        <button
-          onClick={handleSubmit}
+        {/* Textarea — fills remaining height */}
+        <textarea
+          value={ideaText}
+          onChange={e => setIdeaText(e.target.value)}
+          placeholder={`Describe your startup idea in detail.\n\nFor example: "An AI-powered invoicing platform for freelancers that automatically tracks billable hours from calendar events, generates professional invoices, and sends payment reminders. Target market is solo developers and designers charging $50–200/hr. Revenue model: $15/mo SaaS."`}
           disabled={isGenerating}
           style={{
-            height: 38,
-            padding: '0 20px',
-            borderRadius: 9,
-            fontSize: 13,
-            fontWeight: 600,
-            fontFamily: 'inherit',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 7,
-            cursor: isGenerating ? 'not-allowed' : 'pointer',
-            transition: 'all 140ms ease',
+            flex: 1,
+            resize: 'none',
             border: 'none',
-            background: isGenerating ? 'var(--bg-4)' : 'var(--accent)',
-            color: isGenerating ? 'var(--text-3)' : 'white',
-            boxShadow: isGenerating ? 'none' : '0 2px 12px rgba(99,102,241,0.25)',
-            whiteSpace: 'nowrap',
-            flexShrink: 0,
+            outline: 'none',
+            background: ideaError ? 'rgba(239,68,68,0.02)' : 'var(--bg)',
+            padding: '24px',
+            fontSize: 14,
+            lineHeight: 1.75,
+            color: 'var(--text)',
+            fontFamily: 'inherit',
+            transition: 'background 200ms',
           }}
-          onMouseEnter={e => {
-            if (!isGenerating) {
-              (e.currentTarget as HTMLElement).style.background = 'var(--accent-hover)'
-              ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
-              ;(e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(99,102,241,0.35)'
-            }
-          }}
-          onMouseLeave={e => {
-            if (!isGenerating) {
-              (e.currentTarget as HTMLElement).style.background = 'var(--accent)'
-              ;(e.currentTarget as HTMLElement).style.transform = 'none'
-              ;(e.currentTarget as HTMLElement).style.boxShadow = '0 2px 12px rgba(99,102,241,0.25)'
-            }
-          }}
-        >
-          {isGenerating ? (
-            <>
-              <span style={{
-                width: 12, height: 12,
-                borderRadius: '50%',
-                border: '1.5px solid var(--text-4)',
-                borderTopColor: 'var(--text-2)',
-                display: 'inline-block',
-                animation: 'spin 0.7s linear infinite',
-                flexShrink: 0,
-              }} />
-              Generating...
-            </>
-          ) : (
-            <>
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M9 1.5L4.5 8.5H8L7 14.5L12 7H8.5L9 1.5Z" />
-              </svg>
-              Generate
-            </>
-          )}
-        </button>
-      </div>
+          className="placeholder:text-[var(--text-4)] disabled:opacity-50"
+        />
 
-      {/* ── Row 2: Expanded options (Context + Focus + token bar) ── */}
-      {expanded && (
+        {/* Bottom bar: token usage + generate */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr auto auto',
-          alignItems: 'start',
-          gap: 16,
-          padding: '14px 20px',
+          padding: '12px 24px',
+          borderTop: '1px solid var(--border)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexShrink: 0,
+          background: 'var(--bg-2)',
         }}>
-
-          {/* Context textarea */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-3)' }}>
-              Context (optional)
+          {/* Token bar */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-4)' }}>
+              token usage
             </span>
-            <textarea
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              placeholder="Target market, core problem, revenue ideas..."
-              disabled={isGenerating}
-              rows={2}
-              style={{
-                width: '100%',
-                background: 'var(--bg-3)',
-                border: '1px solid var(--border-2)',
-                borderRadius: 8,
-                padding: '8px 12px',
-                fontSize: 12,
-                color: 'var(--text)',
-                outline: 'none',
-                resize: 'none',
-                lineHeight: 1.6,
-                fontFamily: 'inherit',
-                transition: 'border-color 140ms',
-              }}
-              className="focus:border-[var(--accent)] placeholder:text-[var(--text-4)] disabled:opacity-50"
-            />
+            <div style={{ width: 72, height: 2, background: 'var(--border-2)', borderRadius: 99, overflow: 'hidden' }}>
+              <div style={{
+                height: '100%',
+                width: `${Math.min(tokenUsagePercent, 100)}%`,
+                background: 'var(--accent)',
+                borderRadius: 99,
+                transition: 'width 300ms',
+              }} />
+            </div>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-4)' }}>
+              {tokenUsageLabel}
+            </span>
           </div>
 
-          {/* Focus chips */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-3)' }}>
-              Focus sections
-            </span>
-            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', maxWidth: 240 }}>
-              {FOCUS_OPTIONS.map(item => (
+          {/* Generate button */}
+          <button
+            onClick={handleSubmit}
+            disabled={isGenerating}
+            style={{
+              height: 40,
+              padding: '0 28px',
+              borderRadius: 10,
+              fontSize: 13,
+              fontWeight: 600,
+              fontFamily: 'inherit',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              cursor: isGenerating ? 'not-allowed' : 'pointer',
+              transition: 'all 140ms ease',
+              border: 'none',
+              background: isGenerating ? 'var(--bg-4)' : 'var(--accent)',
+              color: isGenerating ? 'var(--text-3)' : 'white',
+              boxShadow: isGenerating ? 'none' : '0 2px 14px rgba(99,102,241,0.28)',
+            }}
+            onMouseEnter={e => {
+              if (!isGenerating) {
+                (e.currentTarget as HTMLElement).style.background = 'var(--accent-hover)'
+                ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
+                ;(e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(99,102,241,0.38)'
+              }
+            }}
+            onMouseLeave={e => {
+              if (!isGenerating) {
+                (e.currentTarget as HTMLElement).style.background = 'var(--accent)'
+                ;(e.currentTarget as HTMLElement).style.transform = 'none'
+                ;(e.currentTarget as HTMLElement).style.boxShadow = '0 2px 14px rgba(99,102,241,0.28)'
+              }
+            }}
+          >
+            {isGenerating ? (
+              <>
+                <span style={{
+                  width: 13, height: 13,
+                  borderRadius: '50%',
+                  border: '1.5px solid var(--text-4)',
+                  borderTopColor: 'var(--text-2)',
+                  display: 'inline-block',
+                  animation: 'spin 0.7s linear infinite',
+                  flexShrink: 0,
+                }} />
+                Generating...
+              </>
+            ) : (
+              <>
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 1.5L4.5 8.5H8L7 14.5L12 7H8.5L9 1.5Z" />
+                </svg>
+                Generate Blueprint
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* ── RIGHT: options panel ── */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        overflowY: 'auto',
+        background: 'var(--bg-2)',
+      }}
+        className="[&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-[var(--border-2)] [&::-webkit-scrollbar-thumb]:rounded-full"
+      >
+        <div style={{ padding: '20px 18px', display: 'flex', flexDirection: 'column', gap: 22 }}>
+
+          {/* Industry */}
+          <div>
+            <span style={labelStyle}>Industry</span>
+            <div style={{ position: 'relative' }}>
+              <select
+                value={industry}
+                onChange={e => setIndustry(e.target.value)}
+                disabled={isGenerating}
+                style={{
+                  width: '100%',
+                  background: 'var(--bg-3)',
+                  border: '1px solid var(--border-2)',
+                  borderRadius: 8,
+                  padding: '0 30px 0 11px',
+                  height: 36,
+                  fontSize: 12,
+                  color: 'var(--text)',
+                  outline: 'none',
+                  cursor: 'pointer',
+                  appearance: 'none',
+                  fontFamily: 'inherit',
+                  transition: 'border-color 140ms',
+                }}
+                className="focus:border-[var(--accent)] disabled:opacity-50"
+              >
+                {INDUSTRIES.map(ind => (
+                  <option key={ind.value} value={ind.value}>{ind.label}</option>
+                ))}
+              </select>
+              <svg style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-3)' }}
+                width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M4 6l4 4 4-4" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Stage */}
+          <div>
+            <span style={labelStyle}>Stage</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              {STAGES.map(s => (
                 <button
-                  key={item}
-                  onClick={() => toggleFocus(item)}
+                  key={s.value}
+                  onClick={() => setStage(s.value)}
                   disabled={isGenerating}
                   style={{
-                    height: 26,
-                    padding: '0 10px',
-                    borderRadius: 5,
-                    fontSize: 11,
-                    fontFamily: 'var(--font-mono)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '8px 12px',
+                    borderRadius: 8,
                     border: '1px solid',
                     cursor: isGenerating ? 'not-allowed' : 'pointer',
                     transition: 'all 100ms',
-                    background: focus.includes(item) ? 'var(--accent-dim)' : 'transparent',
-                    borderColor: focus.includes(item) ? 'var(--accent)' : 'var(--border-2)',
-                    color: focus.includes(item) ? 'var(--accent)' : 'var(--text-3)',
+                    background: stage === s.value ? 'var(--accent-dim)' : 'transparent',
+                    borderColor: stage === s.value ? 'var(--accent)' : 'var(--border-2)',
                     opacity: isGenerating ? 0.5 : 1,
+                    textAlign: 'left',
                   }}
                 >
-                  {item}
+                  <span style={{ fontSize: 12, fontWeight: 500, color: stage === s.value ? 'var(--accent)' : 'var(--text)' }}>
+                    {s.label}
+                  </span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: stage === s.value ? 'var(--accent)' : 'var(--text-4)' }}>
+                    {s.desc}
+                  </span>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Token usage */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 5, alignItems: 'flex-end' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-3)' }}>
-              Token usage
-            </span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 80, height: 3, background: 'var(--border-2)', borderRadius: 99, overflow: 'hidden' }}>
-                <div style={{
-                  height: '100%',
-                  width: `${Math.min(tokenUsagePercent, 100)}%`,
-                  background: 'var(--accent)',
-                  borderRadius: 99,
-                  transition: 'width 300ms',
-                }} />
-              </div>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-3)', whiteSpace: 'nowrap' }}>
-                {tokenUsageLabel}
-              </span>
+          {/* Divider */}
+          <div style={{ height: 1, background: 'var(--border)', margin: '0 -18px' }} />
+
+          {/* Focus */}
+          <div>
+            <span style={labelStyle}>Focus sections</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {FOCUS_OPTIONS.map(({ key, label }) => {
+                const active = focus.includes(key)
+                return (
+                  <button
+                    key={key}
+                    onClick={() => toggleFocus(key)}
+                    disabled={isGenerating}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      padding: '7px 10px',
+                      borderRadius: 7,
+                      border: '1px solid',
+                      cursor: isGenerating ? 'not-allowed' : 'pointer',
+                      transition: 'all 100ms',
+                      background: active ? 'var(--accent-dim)' : 'transparent',
+                      borderColor: active ? 'var(--accent-border)' : 'transparent',
+                      opacity: isGenerating ? 0.5 : 1,
+                      textAlign: 'left',
+                    }}
+                    onMouseEnter={e => { if (!active && !isGenerating) (e.currentTarget as HTMLElement).style.background = 'var(--bg-3)' }}
+                    onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+                  >
+                    <div style={{
+                      width: 14, height: 14, borderRadius: 4, border: `1.5px solid ${active ? 'var(--accent)' : 'var(--border-2)'}`,
+                      background: active ? 'var(--accent)' : 'transparent',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 100ms',
+                    }}>
+                      {active && (
+                        <svg width="8" height="8" viewBox="0 0 10 10" fill="none" stroke="white" strokeWidth="1.8">
+                          <path d="M2 5l2.5 2.5L8 3" />
+                        </svg>
+                      )}
+                    </div>
+                    <span style={{ fontSize: 12, color: active ? 'var(--accent)' : 'var(--text-2)' }}>{label}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div style={{ height: 1, background: 'var(--border)', margin: '0 -18px' }} />
+
+          {/* AI Model */}
+          <div>
+            <span style={labelStyle}>AI Model</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              {MODELS.map(m => (
+                <button
+                  key={m.value}
+                  onClick={() => setModel(m.value as 'standard' | 'power')}
+                  disabled={isGenerating}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '8px 12px',
+                    borderRadius: 8,
+                    border: '1px solid',
+                    cursor: isGenerating ? 'not-allowed' : 'pointer',
+                    transition: 'all 100ms',
+                    background: model === m.value ? 'var(--accent-dim)' : 'transparent',
+                    borderColor: model === m.value ? 'var(--accent)' : 'var(--border-2)',
+                    opacity: isGenerating ? 0.5 : 1,
+                  }}
+                >
+                  <span style={{ fontSize: 12, fontWeight: 500, color: model === m.value ? 'var(--accent)' : 'var(--text)' }}>
+                    {m.label}
+                  </span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, padding: '2px 6px', borderRadius: 4, background: model === m.value ? 'rgba(99,102,241,0.15)' : 'var(--bg-4)', color: model === m.value ? 'var(--accent)' : 'var(--text-4)', border: '1px solid', borderColor: model === m.value ? 'var(--accent-border)' : 'var(--border)' }}>
+                    {m.badge}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
 
         </div>
-      )}
+      </div>
     </div>
   )
 }

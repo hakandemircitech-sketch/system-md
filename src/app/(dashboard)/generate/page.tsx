@@ -27,50 +27,6 @@ interface BlueprintApiResult {
 type Phase = 'idle' | 'generating' | 'complete'
 
 /* ── Idle state ── */
-function IdleState() {
-  return (
-    <div className="flex-1 flex flex-col items-center justify-center" style={{ padding: '40px 24px' }}>
-      {/* Terminal preview */}
-      <div style={{
-        fontFamily: 'var(--font-mono)',
-        fontSize: 11,
-        lineHeight: 2,
-        color: 'var(--text-4)',
-        backgroundColor: 'var(--bg-2)',
-        border: '1px solid var(--border)',
-        borderRadius: 10,
-        padding: '16px 20px',
-        width: '100%',
-        maxWidth: 400,
-        marginBottom: 20,
-      }}>
-        <div><span style={{ color: 'var(--text-4)' }}>$ </span><span style={{ color: 'var(--text-3)' }}>smd generate --streaming</span></div>
-        <div style={{ color: 'var(--text-4)' }}>{'  // waiting for input...'}</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <span style={{ color: 'var(--text-4)' }}>$ </span>
-          <span style={{ display: 'inline-block', width: 6, height: 12, backgroundColor: 'var(--text-3)', animation: 'blink 1.1s step-end infinite' }} />
-        </div>
-      </div>
-
-      <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-2)', marginBottom: 6, textAlign: 'center' }}>
-        Ready to generate
-      </p>
-      <p style={{ fontSize: 12, color: 'var(--text-3)', lineHeight: 1.65, maxWidth: 320, textAlign: 'center' }}>
-        Type your startup idea above and hit <strong style={{ color: 'var(--text-2)' }}>Generate</strong> — AI will build a complete blueprint in under 60 seconds.
-      </p>
-
-      {/* Feature chips */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 20, justifyContent: 'center', maxWidth: 400 }}>
-        {['Architecture', 'DB Schema', 'API Design', 'Revenue Model', 'Build Kit', 'AI Feedback'].map(label => (
-          <span key={label} style={{ fontFamily: 'var(--font-mono)', fontSize: 10, padding: '3px 10px', borderRadius: 5, border: '1px solid var(--border-2)', color: 'var(--text-4)', background: 'var(--bg-3)' }}>
-            {label}
-          </span>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 /* ── Hata durumu ── */
 function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
@@ -514,64 +470,59 @@ export default function GeneratePage() {
         </div>
       </div>
 
-      {/* Top: input bar */}
-      <InputPanel
-        onGenerate={handleGenerate}
-        isGenerating={isGenerating}
-        tokenUsagePercent={tokenUsagePercent}
-        tokenUsageLabel={tokenUsageLabel}
-        onClear={handleRetry}
-      />
+      {/* ── IDLE: InputPanel tüm alanı kaplar ── */}
+      {phase === 'idle' && !error && (
+        <InputPanel
+          onGenerate={handleGenerate}
+          isGenerating={isGenerating}
+          tokenUsagePercent={tokenUsagePercent}
+          tokenUsageLabel={tokenUsageLabel}
+          onClear={handleRetry}
+        />
+      )}
 
-      {/* Bottom: output — flex-1, full width */}
-      <div
-        className="flex flex-col flex-1 overflow-hidden min-h-0 relative"
-        style={{ background: 'var(--bg)' }}
-      >
-        {/* Error */}
-        {error && phase === 'idle' && (
-          <>
-            <div className="px-6 py-4 border-b flex items-center gap-[7px] flex-shrink-0" style={{ borderColor: 'var(--border)' }}>
-              <div className="w-[5px] h-[5px] rounded-full" style={{ background: 'var(--red)' }} />
-              <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '10px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-3)' }}>error</span>
-            </div>
-            <ErrorState message={error} onRetry={handleRetry} />
-          </>
-        )}
+      {/* ── ERROR ── */}
+      {error && phase === 'idle' && (
+        <div className="flex flex-col flex-1 overflow-hidden min-h-0">
+          <div className="px-6 py-3 border-b flex items-center gap-[7px] flex-shrink-0" style={{ borderColor: 'var(--border)' }}>
+            <div className="w-[5px] h-[5px] rounded-full" style={{ background: 'var(--red)' }} />
+            <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '10px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-3)' }}>error</span>
+          </div>
+          <ErrorState message={error} onRetry={handleRetry} />
+        </div>
+      )}
 
-        {/* Idle */}
-        {!error && phase === 'idle' && <IdleState />}
-
-        {/* Generating */}
-        {phase === 'generating' && (
+      {/* ── GENERATING ── */}
+      {phase === 'generating' && (
+        <div className="flex flex-col flex-1 overflow-hidden min-h-0">
           <TerminalPanel
             lines={generationLog}
             progress={generationProgress}
             isGenerating={isGenerating}
             blueprintTitle={blueprintTitle}
           />
-        )}
+        </div>
+      )}
 
-        {/* Loading result */}
-        {loadingResult && (
-          <>
-            <div className="px-6 py-4 border-b flex items-center gap-[7px] flex-shrink-0" style={{ borderColor: 'var(--border)' }}>
-              <div className="w-[5px] h-[5px] rounded-full bg-[var(--yellow)] animate-pulse" />
-              <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '10px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-3)' }}>loading blueprint...</span>
-            </div>
-            <ResultSkeleton />
-          </>
-        )}
+      {/* ── LOADING RESULT ── */}
+      {loadingResult && (
+        <div className="flex flex-col flex-1 overflow-hidden min-h-0">
+          <div className="px-6 py-3 border-b flex items-center gap-[7px] flex-shrink-0" style={{ borderColor: 'var(--border)' }}>
+            <div className="w-[5px] h-[5px] rounded-full bg-[var(--yellow)] animate-pulse" />
+            <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '10px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-3)' }}>loading blueprint...</span>
+          </div>
+          <ResultSkeleton />
+        </div>
+      )}
 
-        {/* Complete */}
-        {phase === 'complete' && blueprintResult && !loadingResult && (
-          <ResultView
-            result={blueprintResult}
-            onRegenerateClick={handleRetry}
-            onSaveToLibrary={handleSaveToLibrary}
-          />
-        )}
-      </div>
+      {/* ── COMPLETE ── */}
+      {phase === 'complete' && blueprintResult && !loadingResult && (
+        <ResultView
+          result={blueprintResult}
+          onRegenerateClick={handleRetry}
+          onSaveToLibrary={handleSaveToLibrary}
+        />
+      )}
     </div>
   )
 }
