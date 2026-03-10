@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { useUiStore } from '@/stores/uiStore'
+import { createClient } from '@/lib/supabase/client'
 import type { DbUser } from '@/types/database'
 
 interface TopbarProps {
@@ -31,6 +32,7 @@ export default function Topbar({ user }: TopbarProps) {
   const searchRef = useRef<HTMLInputElement>(null)
   const [searchVal, setSearchVal] = useState('')
   const [usage, setUsage] = useState<{ remaining: number; plan: string } | null>(null)
+  const [signingOut, setSigningOut] = useState(false)
 
   const basePath = getBasePath(pathname)
   const pageName = BREADCRUMBS[basePath] ?? ''
@@ -73,6 +75,14 @@ export default function Topbar({ user }: TopbarProps) {
       setSearchVal('')
       searchRef.current?.blur()
     }
+  }
+
+  async function handleSignOut() {
+    setSigningOut(true)
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/auth/login')
+    router.refresh()
   }
 
   return (
@@ -227,6 +237,49 @@ export default function Topbar({ user }: TopbarProps) {
           </svg>
           <span className="hidden sm:inline">New Blueprint</span>
         </Link>
+
+        {/* Sign Out */}
+        <button
+          onClick={handleSignOut}
+          disabled={signingOut}
+          title="Çıkış yap"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            padding: '6px 12px',
+            background: 'transparent',
+            color: 'var(--text-4)',
+            border: '1px solid var(--border)',
+            borderRadius: 8,
+            fontSize: 12,
+            fontFamily: 'var(--font-mono)',
+            cursor: signingOut ? 'not-allowed' : 'pointer',
+            opacity: signingOut ? 0.5 : 1,
+            transition: 'all 120ms ease',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+          }}
+          onMouseEnter={e => {
+            if (!signingOut) {
+              (e.currentTarget as HTMLElement).style.borderColor = 'var(--red)'
+              ;(e.currentTarget as HTMLElement).style.color = 'var(--red)'
+            }
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'
+            ;(e.currentTarget as HTMLElement).style.color = 'var(--text-4)'
+          }}
+        >
+          {signingOut ? (
+            <span style={{ width: 10, height: 10, border: '1.5px solid var(--text-4)', borderTopColor: 'var(--text-2)', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite' }} />
+          ) : (
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6">
+              <path d="M10 3h3a1 1 0 011 1v8a1 1 0 01-1 1h-3M6.5 5.5L10 8l-3.5 2.5M1 8h9" />
+            </svg>
+          )}
+          <span className="hidden sm:inline">{signingOut ? 'Çıkılıyor...' : 'Çıkış'}</span>
+        </button>
 
       </div>
     </header>
