@@ -453,6 +453,7 @@ export default function GeneratePage() {
           </Link>
           )}
         </div>
+      </div>
 
       {/* Two Column Layout */}
       <div
