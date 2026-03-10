@@ -110,7 +110,7 @@ function SettingRow({
     >
       <div className="flex-1 min-w-0">
         <div className="text-[13px] font-medium text-[var(--text)] mb-[3px]">{label}</div>
-        {desc && <div className="text-[12px] text-[var(--text-3)] leading-[1.5]">{desc}</div>}
+        {desc && <div className="text-[12px] text-[var(--text-2)] leading-[1.5]">{desc}</div>}
       </div>
       {children}
     </div>
@@ -872,7 +872,7 @@ export default function SettingsPage() {
   const dangerItems = NAV_ITEMS.filter((i) => i.group === 'danger')
 
   return (
-    <div className="-m-7 overflow-hidden flex" style={{ height: 'calc(100vh - 56px)' }}>
+    <div className="-m-8 overflow-hidden flex" style={{ height: 'calc(100vh - 52px)' }}>
       {/* ── Settings Nav ── */}      <nav className="w-[200px] min-w-[200px] border-r border-[var(--border)] bg-[var(--bg-2)] flex flex-col gap-[2px] p-[10px] overflow-y-auto [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:bg-[var(--border-2)]">
         <div className="font-mono text-[9px] text-[var(--text-4)] uppercase tracking-[0.12em] px-2 pt-[10px] pb-1">
           Account
@@ -939,7 +939,6 @@ export default function SettingsPage() {
           <ErrorState message={loadError} onRetry={() => void loadUser()} />
         ) : (
         <>
-          <div className="h-px bg-[var(--border)] mb-6" />
           <div style={{ animation: 'fadeUp 0.25s ease' }}>
           {activeSection === 'profile' && (
             <ProfileSection user={user} loading={loading} onSave={handleProfileSave} />

@@ -49,9 +49,11 @@ function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-2 text-[13px] font-semibold tracking-[-0.01em] text-[var(--text)] mb-3">
-      {children}
-      <span className="flex-1 h-px bg-[var(--border-2)]" />
+    <div className="flex items-center gap-3 mb-4 mt-8">
+      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-3)', whiteSpace: 'nowrap' }}>
+        {children}
+      </span>
+      <span style={{ flex: 1, height: 1, background: 'var(--border)' }} />
     </div>
   )
 }
@@ -175,7 +177,7 @@ function BillingSettings({
       <div className="flex items-center justify-between gap-6 px-5 py-[14px] border-b border-[var(--border)]">
         <div>
           <div className="text-[13px] font-medium text-[var(--text)] mb-[3px]">Auto-renew</div>
-          <div className="text-[12px] text-[var(--text-3)] leading-[1.5]">
+          <div className="text-[12px] text-[var(--text-2)] leading-[1.5]">
             Automatically renew your subscription each billing cycle.
           </div>
         </div>
@@ -185,7 +187,7 @@ function BillingSettings({
       <div className="flex items-center justify-between gap-6 px-5 py-[14px] border-b border-[var(--border)]">
         <div>
           <div className="text-[13px] font-medium text-[var(--text)] mb-[3px]">Email receipts</div>
-          <div className="text-[12px] text-[var(--text-3)] leading-[1.5]">
+          <div className="text-[12px] text-[var(--text-2)] leading-[1.5]">
             Send invoice copies to your account email.
           </div>
         </div>
@@ -195,7 +197,7 @@ function BillingSettings({
       <div className="flex items-center justify-between gap-6 px-5 py-[14px]">
         <div>
           <div className="text-[13px] font-medium text-[var(--text)] mb-[3px]">VAT / Tax ID</div>
-          <div className="text-[12px] text-[var(--text-3)] leading-[1.5]">
+          <div className="text-[12px] text-[var(--text-2)] leading-[1.5]">
             Add a VAT number for EU tax compliance.
           </div>
         </div>
@@ -457,30 +459,38 @@ export default function BillingPage() {
         />
       )}
 
-      <div className="flex items-center justify-between mb-7">
-        <div>
-          <h1 className="text-[20px] font-semibold text-[var(--text)] tracking-[-0.02em]">Billing</h1>
-          <p className="text-[13px] text-[var(--text-3)] mt-[3px]">Manage your plan, payments, and invoices.</p>
-        </div>
-        <button
-          onClick={handleDownloadAll}
-          className="inline-flex items-center gap-[6px] px-3 py-[6px] bg-transparent text-[var(--text-2)] border border-[var(--border-2)] rounded-[6px] text-[11px] cursor-pointer hover:bg-[var(--bg-3)] hover:text-[var(--text)] transition-all"
-        >
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M8 2v8M5 7l3 3 3-3M2 13h12" />
-          </svg>
-          Download All
-        </button>
-      </div>
-
       {loading ? (
         <BillingSkeleton />
       ) : (
-        <div className="max-w-[860px] mx-auto" style={{ animation: 'fadeUp 0.3s ease' }}>
+        <div style={{ animation: 'fadeUp 0.3s ease' }}>
 
-          {user && (
-            <CurrentPlanCard user={user} subscription={subscription} />
-          )}
+          {/* Page header */}
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 32 }}>
+            <div>
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--text-4)', marginBottom: 10 }}>
+                account
+              </p>
+              <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 40, fontWeight: 400, lineHeight: 1.05, letterSpacing: '-0.025em', color: 'var(--text)' }}>
+                Plan &amp; Billing
+              </h1>
+              <p style={{ fontSize: 13, color: 'var(--text-2)', marginTop: 6 }}>
+                Manage your plan, payments, and invoices.
+              </p>
+            </div>
+            <button
+              onClick={handleDownloadAll}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: 'transparent', color: 'var(--text-2)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12, cursor: 'pointer', transition: 'all 120ms', flexShrink: 0 }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--bg-3)'; (e.currentTarget as HTMLElement).style.color = 'var(--text)' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'var(--text-2)' }}
+            >
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M8 2v8M5 7l3 3 3-3M2 13h12" />
+              </svg>
+              Download All
+            </button>
+          </div>
+
+          {user && <CurrentPlanCard user={user} subscription={subscription} />}
 
           <div className="mb-8" style={{ animation: 'fadeUp 0.3s ease 0.08s both' }}>
             <SectionTitle>Upgrade your plan</SectionTitle>

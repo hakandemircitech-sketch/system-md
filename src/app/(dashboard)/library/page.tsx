@@ -748,8 +748,8 @@ export default function LibraryPage() {
   const hasSearch = debouncedSearch.trim() !== '' || industryFilter !== 'all'
 
   return (
-    // -m-7 to escape layout padding, full height
-    <div className="-m-7 flex flex-col overflow-hidden" style={{ height: 'calc(100vh - 56px)' }}>
+    // -m-8 to escape layout padding, full height (layout uses py-8 px-8)
+    <div className="-m-8 flex flex-col overflow-hidden" style={{ height: 'calc(100vh - 52px)' }}>
 
       {/* Stats Row */}
       <div className="flex items-center gap-6 px-6 py-3 border-b border-[var(--border)] bg-[var(--bg)] flex-shrink-0">
@@ -773,7 +773,7 @@ export default function LibraryPage() {
               className={`font-mono text-[11px] px-3 py-[5px] rounded-full cursor-pointer transition-all duration-[120ms] border ${
                 industryFilter === key
                   ? 'text-[var(--text)] bg-[var(--bg-4)] border-[var(--border-2)]'
-                  : 'text-[var(--text-3)] bg-transparent border-transparent hover:text-[var(--text-2)] hover:bg-[var(--bg-3)]'
+                  : 'text-[var(--text-2)] bg-transparent border-transparent hover:text-[var(--text)] hover:bg-[var(--bg-3)]'
               }`}
             >
               {label}
