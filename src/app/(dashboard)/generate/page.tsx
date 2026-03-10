@@ -447,11 +447,10 @@ export default function GeneratePage() {
     : phase === 'generating' ? 'generating...' : `${Math.round(tokenUsagePercent)}% / 100k`
 
   return (
-    /* Full-bleed IDE layout */
+    /* Full-bleed IDE layout — layout padding'ini iptal et */
     <div
-      data-full-bleed
       className="flex flex-col overflow-hidden"
-      style={{ height: 'calc(100vh - 52px)' }}
+      style={{ margin: '-32px -40px', height: 'calc(100vh - 52px)' }}
     >
       {/* Page Header */}
       <div style={{

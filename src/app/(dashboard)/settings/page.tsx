@@ -872,7 +872,7 @@ export default function SettingsPage() {
   const dangerItems = NAV_ITEMS.filter((i) => i.group === 'danger')
 
   return (
-    <div className="-m-8 overflow-hidden flex" style={{ height: 'calc(100vh - 52px)' }}>
+    <div style={{ margin: '-32px -40px', height: 'calc(100vh - 52px)', display: 'flex', overflow: 'hidden' }}>
       {/* ── Settings Nav ── */}      <nav className="w-[200px] min-w-[200px] border-r border-[var(--border)] bg-[var(--bg-2)] flex flex-col gap-[2px] p-[10px] overflow-y-auto [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:bg-[var(--border-2)]">
         <div className="font-mono text-[9px] text-[var(--text-4)] uppercase tracking-[0.12em] px-2 pt-[10px] pb-1">
           Account
