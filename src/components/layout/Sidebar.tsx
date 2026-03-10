@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -25,7 +26,7 @@ const NAV_MAIN = [
   },
   {
     href: '/generate',
-    label: 'Idea Generator',
+    label: 'Generate',
     badge: 'NEW',
     icon: (
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0">
@@ -35,7 +36,7 @@ const NAV_MAIN = [
   },
   {
     href: '/library',
-    label: 'Blueprint Library',
+    label: 'My Blueprints',
     icon: (
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0">
         <rect x="2" y="2" width="12" height="12" rx="2" />
@@ -47,22 +48,22 @@ const NAV_MAIN = [
 
 const NAV_WORKSPACE = [
   {
+    href: '/billing',
+    label: 'Plan & Billing',
+    icon: (
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0">
+        <rect x="1.5" y="3.5" width="13" height="9" rx="1.5" />
+        <path d="M1.5 7h13M4.5 10.5h3" />
+      </svg>
+    ),
+  },
+  {
     href: '/settings',
     label: 'Settings',
     icon: (
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0">
         <circle cx="8" cy="8" r="2.5" />
         <path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4" />
-      </svg>
-    ),
-  },
-  {
-    href: '/billing',
-    label: 'Billing',
-    icon: (
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0">
-        <rect x="1.5" y="3.5" width="13" height="9" rx="1.5" />
-        <path d="M1.5 7h13M4.5 10.5h3" />
       </svg>
     ),
   },
@@ -183,6 +184,21 @@ export default function Sidebar({ user }: SidebarProps) {
   const router = useRouter()
   const supabase = createClient()
   const { mobileSidebarOpen, setMobileSidebarOpen } = useUiStore()
+  const [usage, setUsage] = React.useState<{ used: number; limit: number; remaining: number } | null>(null)
+
+  React.useEffect(() => {
+    fetch('/api/usage')
+      .then(r => r.json())
+      .then(d => { if (!d.error) setUsage(d) })
+      .catch(() => {})
+  }, [])
+
+  const PLAN_LIMITS: Record<string, number> = { free: 10, pro: 30, team: 150 }
+  const planLimit = PLAN_LIMITS[user.plan] ?? 10
+  const usedCount = user.blueprint_count ?? 0
+  const remaining = Math.max(0, (usage?.remaining ?? (planLimit - usedCount)))
+  const usagePct = Math.min(Math.round(((planLimit - remaining) / planLimit) * 100), 100)
+  const usageBarColor = usagePct >= 90 ? 'var(--red)' : usagePct >= 70 ? 'var(--yellow)' : 'var(--accent)'
 
   const displayName = user.full_name ?? user.email.split('@')[0] ?? 'User'
   const initials = displayName
@@ -256,6 +272,43 @@ export default function Sidebar({ user }: SidebarProps) {
           ))}
         </NavSection>
       </nav>
+
+      {/* Usage Widget */}
+      <div style={{
+        margin: '0 8px 8px',
+        padding: '10px 12px',
+        background: 'var(--bg-3)',
+        border: '1px solid var(--border)',
+        borderRadius: '8px',
+        flexShrink: 0,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-3)' }}>
+            Generates
+          </span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 600, color: usageBarColor }}>
+            {remaining}/{planLimit}
+          </span>
+        </div>
+        <div style={{ height: 4, background: 'var(--bg-4)', borderRadius: 99, overflow: 'hidden' }}>
+          <div style={{
+            height: '100%',
+            width: `${usagePct}%`,
+            background: usageBarColor,
+            borderRadius: 99,
+            transition: 'width 0.4s ease',
+          }} />
+        </div>
+        <div style={{ marginTop: 6, fontSize: '10px', color: 'var(--text-3)' }}>
+          {remaining === 0 ? (
+            <Link href="/billing" style={{ color: 'var(--accent)', textDecoration: 'none', fontWeight: 500 }}>
+              Upgrade for more →
+            </Link>
+          ) : (
+            <span>{remaining} left on <span style={{ textTransform: 'capitalize' }}>{user.plan}</span> plan</span>
+          )}
+        </div>
+      </div>
 
       {/* User + Sign out */}
       <div className="border-t border-[var(--border)] shrink-0">

@@ -12,31 +12,15 @@ interface TopbarProps {
 
 const BREADCRUMBS: Record<string, string> = {
   '/dashboard': 'Dashboard',
-  '/generate':  'Idea Generator',
-  '/library':   'Blueprint Library',
+  '/generate':  'Generate',
+  '/library':   'My Blueprints',
   '/settings':  'Settings',
-  '/billing':   'Billing',
+  '/billing':   'Plan & Billing',
 }
 
 function getBasePath(pathname: string): string {
   const parts = pathname.split('/')
   return '/' + (parts[1] ?? '')
-}
-
-function getUsagePercent(used: number, plan: string): number {
-  const limits: Record<string, number> = {
-    free:   100_000,
-    solo:   1_000_000,
-    agency: 10_000_000,
-  }
-  const limit = limits[plan] ?? 100_000
-  return Math.min(Math.round((used / limit) * 100), 100)
-}
-
-function getUsageColor(pct: number): string {
-  if (pct >= 90) return 'var(--red)'
-  if (pct >= 70) return 'var(--yellow)'
-  return 'var(--accent)'
 }
 
 function NewBlueprintButton() {
@@ -65,13 +49,26 @@ export default function Topbar({ user }: TopbarProps) {
   const { toggleMobileSidebar } = useUiStore()
   const searchRef = useRef<HTMLInputElement>(null)
   const [searchVal, setSearchVal] = useState('')
+  const [usage, setUsage] = useState<{ remaining: number; limit: number; plan: string } | null>(null)
 
   const basePath = getBasePath(pathname)
   const pageName = BREADCRUMBS[basePath] ?? ''
-  const usagePct = getUsagePercent(user.api_tokens_used, user.plan)
-  const usageColor = getUsageColor(usagePct)
   const action = PAGE_ACTIONS[basePath]
-  const planLabel = ({ free: 'FREE', pro: 'PRO', team: 'PRO' } as Record<string, string>)[user.plan] ?? user.plan.toUpperCase()
+
+  const PLAN_LIMITS: Record<string, number> = { free: 10, pro: 30, team: 150 }
+  const planLimit = PLAN_LIMITS[user.plan] ?? 10
+  const usedCount = user.blueprint_count ?? 0
+  const remaining = usage?.remaining ?? Math.max(0, planLimit - usedCount)
+  const usagePct = Math.min(Math.round(((planLimit - remaining) / planLimit) * 100), 100)
+  const usageColor = usagePct >= 90 ? 'var(--red)' : usagePct >= 70 ? 'var(--yellow)' : 'var(--accent)'
+  const planLabel = ({ free: 'FREE', pro: 'PRO', team: 'TEAM' } as Record<string, string>)[user.plan] ?? user.plan.toUpperCase()
+
+  useEffect(() => {
+    fetch('/api/usage')
+      .then(r => r.json())
+      .then(d => { if (!d.error) setUsage(d) })
+      .catch(() => {})
+  }, [])
 
   // ⌘K / Ctrl+K focuses the search input
   useEffect(() => {
@@ -192,11 +189,12 @@ export default function Topbar({ user }: TopbarProps) {
 
       {/* Right side */}
       <div className="ml-auto flex items-center gap-2">
-        {/* API usage pill */}
-        <div
-          className="hidden sm:flex items-center gap-1.5 font-mono text-[var(--text-3)] bg-[var(--bg-3)] border border-[var(--border)] rounded-full px-3 py-1 cursor-default"
+        {/* Generates remaining pill */}
+        <Link
+          href="/billing"
+          className="hidden sm:flex items-center gap-1.5 font-mono bg-[var(--bg-3)] border border-[var(--border)] rounded-full px-3 py-1 no-underline hover:border-[var(--border-2)] transition-all duration-100"
           style={{ fontSize: '9px' }}
-          title={`${user.api_tokens_used.toLocaleString()} tokens used`}
+          title={`${remaining} generates remaining on ${planLabel} plan`}
         >
           <span style={{ color: 'var(--text-4)' }}>{planLabel}</span>
           <div className="w-8 h-[3px] bg-[var(--border-2)] rounded-full overflow-hidden">
@@ -205,8 +203,8 @@ export default function Topbar({ user }: TopbarProps) {
               style={{ width: `${usagePct}%`, background: usageColor }}
             />
           </div>
-          <span style={{ color: usageColor }}>{usagePct}%</span>
-        </div>
+          <span style={{ color: usageColor }}>{remaining} left</span>
+        </Link>
 
         {/* Notifications */}
         <button

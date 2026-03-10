@@ -370,7 +370,11 @@ export default function GeneratePage() {
       }
     } catch (err) {
       if ((err as Error).name === 'AbortError') return
-      const msg = err instanceof Error ? err.message : 'An unexpected error occurred.'
+      const rawMsg = err instanceof Error ? err.message : 'An unexpected error occurred.'
+      // Ortam değişkeni eksikse daha anlaşılır mesaj göster
+      const msg = rawMsg.includes('ANTHROPIC_API_KEY')
+        ? 'AI service is not configured. Please add ANTHROPIC_API_KEY to your environment variables.'
+        : rawMsg
       setError(msg)
       setPhase('idle')
     }
@@ -395,7 +399,7 @@ export default function GeneratePage() {
     : Math.min(generationProgress * 0.5, 50) // max 50% during generation
   const tokenUsageLabel = phase === 'complete' && lastTokensUsed > 0
     ? `${lastTokensUsed.toLocaleString()} tokens`
-    : `${Math.round(tokenUsagePercent)}% / 100k`
+    : phase === 'generating' ? 'generating...' : `${Math.round(tokenUsagePercent)}% / 100k`
 
   return (
     /* Full-bleed IDE layout */

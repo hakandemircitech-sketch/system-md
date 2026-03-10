@@ -46,7 +46,7 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
   }
 
   return (
-    <div className="flex h-screen bg-[var(--bg)] overflow-hidden">
+    <div data-theme="light" className="flex h-screen bg-[var(--bg)] overflow-hidden">
       <Sidebar user={user} />
 
       <div className="flex-1 flex flex-col overflow-hidden min-w-0 w-full">

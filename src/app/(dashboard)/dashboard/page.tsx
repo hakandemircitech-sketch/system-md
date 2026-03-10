@@ -11,8 +11,7 @@ import { useAnalyticsOverview } from '@/hooks/useAnalytics'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const FREE_BP_LIMIT = 10
-const FREE_TOKEN_LIMIT = 100_000
+const PLAN_LIMITS: Record<string, number> = { free: 10, pro: 30, team: 150 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -205,9 +204,10 @@ function WorkspaceView({
   timeLabel: string
 }) {
   const blueprintCount = data?.stats.blueprints ?? 0
-  const tokenCount = data?.userMeta?.apiTokensUsed ?? 0
-  const blueprintPct = Math.min((blueprintCount / FREE_BP_LIMIT) * 100, 100)
-  const tokenPct = Math.min((tokenCount / FREE_TOKEN_LIMIT) * 100, 100)
+  const plan = (data?.userMeta?.plan ?? 'free') as string
+  const planLimit = PLAN_LIMITS[plan] ?? 10
+  const remaining = Math.max(0, planLimit - blueprintCount)
+  const blueprintPct = Math.min((blueprintCount / planLimit) * 100, 100)
   const name = data?.userMeta?.name ? data.userMeta.name.split(' ')[0] : null
 
   return (
@@ -244,7 +244,7 @@ function WorkspaceView({
         <div className="bg-[var(--bg-2)] border border-[var(--border)] rounded-[8px] px-5 py-3.5 mb-5 flex items-center gap-5 flex-wrap">
           <div className="flex items-center gap-3 flex-1 min-w-[140px]">
             <span className="font-mono text-[9px] text-[var(--text-4)] uppercase tracking-[0.1em] shrink-0">
-              Blueprints
+              Generates
             </span>
             <div className="flex-1 h-[2px] bg-[var(--border-2)] rounded-full overflow-hidden">
               <div
@@ -253,35 +253,29 @@ function WorkspaceView({
               />
             </div>
             <span className="font-mono text-[10px] text-[var(--text)] shrink-0">
-              {blueprintCount}<span className="text-[var(--text-4)]">/{FREE_BP_LIMIT}</span>
-            </span>
-          </div>
-          <div className="w-px h-3 bg-[var(--border-2)] shrink-0" />
-          <div className="flex items-center gap-3 flex-1 min-w-[140px]">
-            <span className="font-mono text-[9px] text-[var(--text-4)] uppercase tracking-[0.1em] shrink-0">
-              Tokens
-            </span>
-            <div className="flex-1 h-[2px] bg-[var(--border-2)] rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-[width] duration-700"
-                style={{ width: `${tokenPct}%`, background: barColor(tokenPct) }}
-              />
-            </div>
-            <span className="font-mono text-[10px] text-[var(--text)] shrink-0">
-              {Math.round(tokenCount / 1000)}k<span className="text-[var(--text-4)]">/{FREE_TOKEN_LIMIT / 1000}k</span>
+              {blueprintCount}<span className="text-[var(--text-4)]">/{planLimit}</span>
             </span>
           </div>
           <div className="w-px h-3 bg-[var(--border-2)] shrink-0" />
           <div className="flex items-center gap-2 shrink-0">
             <span className="font-mono text-[9px] px-2 py-[2px] rounded-[3px] bg-[var(--bg-4)] border border-[var(--border-2)] text-[var(--text-4)] uppercase tracking-[0.08em]">
-              {data?.userMeta?.plan ?? 'free'}
+              {plan}
             </span>
-            <Link
-              href="/billing"
-              className="font-mono text-[10px] text-[var(--accent)] hover:opacity-70 transition-opacity"
-            >
-              Upgrade →
-            </Link>
+            {remaining === 0 ? (
+              <Link
+                href="/billing"
+                className="font-mono text-[10px] text-[var(--red)] hover:opacity-70 transition-opacity"
+              >
+                Limit reached · Upgrade →
+              </Link>
+            ) : (
+              <Link
+                href="/billing"
+                className="font-mono text-[10px] text-[var(--accent)] hover:opacity-70 transition-opacity"
+              >
+                {remaining} left · Upgrade →
+              </Link>
+            )}
           </div>
         </div>
       )}
