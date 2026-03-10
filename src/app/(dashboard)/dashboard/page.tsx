@@ -4,194 +4,236 @@ import { useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { formatDistanceToNow } from 'date-fns'
-import { Skeleton, SkeletonRow } from '@/components/ui/Skeleton'
-import Badge from '@/components/ui/Badge'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { useAnalyticsOverview } from '@/hooks/useAnalytics'
 
-// ── Constants ─────────────────────────────────────────────────────────────────
-
 const PLAN_LIMITS: Record<string, number> = { free: 10, pro: 30, team: 150 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 function timeAgo(dateStr: string): string {
-  try {
-    return formatDistanceToNow(new Date(dateStr), { addSuffix: true })
-  } catch {
-    return dateStr
-  }
+  try { return formatDistanceToNow(new Date(dateStr), { addSuffix: true }) }
+  catch { return dateStr }
 }
-
-function barColor(pct: number): string {
-  if (pct >= 80) return 'var(--red)'
-  if (pct >= 60) return 'var(--yellow)'
-  return 'var(--accent)'
-}
-
-// ── Score bar ─────────────────────────────────────────────────────────────────
-
-function ScoreBar({ score }: { score: number }) {
-  const color = score >= 85 ? 'var(--accent)' : score >= 70 ? 'var(--yellow)' : 'var(--red)'
-  return (
-    <div className="flex items-center gap-2">
-      <span className="font-mono text-[11px] text-[var(--text)]">{score}</span>
-      <div className="w-12 h-[3px] bg-[var(--border-2)] rounded-full overflow-hidden">
-        <div className="h-full rounded-full" style={{ width: `${score}%`, background: color }} />
-      </div>
-    </div>
-  )
-}
-
-// ── Status badge ──────────────────────────────────────────────────────────────
-
-function statusBadge(status: string) {
-  switch (status) {
-    case 'complete':
-      return { variant: 'green' as const, label: 'Ready' }
-    case 'generating':
-      return { variant: 'yellow' as const, label: 'Building', pulse: true }
-    case 'failed':
-      return { variant: 'red' as const, label: 'Failed' }
-    default:
-      return { variant: 'neutral' as const, label: 'Draft' }
-  }
-}
-
-// ── Skeletons ─────────────────────────────────────────────────────────────────
 
 function DashboardSkeleton() {
   return (
-    <div style={{ animation: 'fadeUp 0.3s ease' }}>
-      {/* Header skeleton */}
-      <div className="mb-8">
-        <Skeleton width={220} height={28} className="mb-2" />
-        <Skeleton width={140} height={11} />
-      </div>
-      {/* Steps skeleton */}
-      <div className="flex gap-3 mb-8">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="flex-1 bg-[var(--bg-2)] border border-[var(--border)] rounded-[10px] p-5">
-            <Skeleton width={32} height={32} className="rounded-[8px] mb-4" />
-            <Skeleton width={80} height={12} className="mb-2" />
-            <Skeleton width="100%" height={10} />
+    <div style={{ animation: 'fadeUp 0.3s ease', maxWidth: 760 }}>
+      <Skeleton width={260} height={44} className="mb-3" />
+      <Skeleton width={200} height={14} className="mb-12" />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 40 }}>
+        {[1,2,3].map(i => (
+          <div key={i} style={{ background: 'var(--bg-2)', border: '1px solid var(--border)', borderRadius: 14, padding: 24 }}>
+            <Skeleton width={36} height={36} className="mb-5" />
+            <Skeleton width={70} height={13} className="mb-2" />
+            <Skeleton width="90%" height={11} />
           </div>
         ))}
-      </div>
-      {/* Table skeleton */}
-      <div className="bg-[var(--bg-2)] border border-[var(--border)] rounded-[10px] overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
-          <Skeleton width={140} height={12} />
-          <Skeleton width={60} height={10} />
-        </div>
-        {[1, 2, 3].map((i) => <SkeletonRow key={i} />)}
       </div>
     </div>
   )
 }
 
-// ── State A — First visit onboarding ─────────────────────────────────────────
+// ── Status dot ────────────────────────────────────────────────────────────────
+function StatusDot({ status }: { status: string }) {
+  const map: Record<string, { color: string; label: string }> = {
+    complete:   { color: '#22c55e', label: 'Ready' },
+    generating: { color: '#eab308', label: 'Building' },
+    failed:     { color: '#ef4444', label: 'Failed' },
+  }
+  const s = map[status] ?? { color: 'var(--text-4)', label: 'Draft' }
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'var(--text-3)' }}>
+      <span style={{ width: 6, height: 6, borderRadius: '50%', background: s.color, flexShrink: 0, display: 'inline-block' }} />
+      {s.label}
+    </span>
+  )
+}
 
+// ── Score chip ────────────────────────────────────────────────────────────────
+function ScoreChip({ score }: { score: number }) {
+  const color = score >= 85 ? '#22c55e' : score >= 70 ? '#eab308' : '#ef4444'
+  return (
+    <span style={{
+      fontFamily: 'var(--font-mono)',
+      fontSize: 11, fontWeight: 600,
+      color, background: color + '18',
+      padding: '2px 7px', borderRadius: 5,
+    }}>
+      {score}
+    </span>
+  )
+}
+
+// ── Step cards helper ─────────────────────────────────────────────────────────
+const STEPS = [
+  {
+    num: '01',
+    title: 'Describe',
+    body: 'One sentence. What does it do, who is it for, what problem does it solve.',
+    icon: (
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
+        <path d="M2 3.5h12M2 6.5h8M2 9.5h10M2 12.5h6" />
+      </svg>
+    ),
+  },
+  {
+    num: '02',
+    title: 'Generate',
+    body: 'Claude builds architecture, DB schema, revenue model and Cursor rules in ~60s.',
+    icon: (
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
+        <path d="M9 1.5L4.5 8.5H8L7 14.5L12 7H8.5L9 1.5Z" />
+      </svg>
+    ),
+  },
+  {
+    num: '03',
+    title: 'Ship',
+    body: 'Download .cursorrules, build.md, and schema.sql — open in Cursor and start coding.',
+    icon: (
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
+        <path d="M8 2v9M5 8l3 3 3-3M2 13h12" />
+      </svg>
+    ),
+  },
+]
+
+// ── State A — first visit ─────────────────────────────────────────────────────
 function OnboardingView({ name, timeLabel }: { name: string | null; timeLabel: string }) {
   return (
-    <div style={{ animation: 'fadeUp 0.4s ease' }}>
+    <div style={{ animation: 'fadeUp 0.45s ease', maxWidth: 720 }}>
 
-      {/* Header */}
-      <div className="mb-10">
-        <p className="font-mono text-[10px] text-[var(--text-4)] mb-3 uppercase tracking-[0.12em]">
+      {/* Hero */}
+      <div style={{ marginBottom: 52 }}>
+        <p style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: 10, fontWeight: 500,
+          textTransform: 'uppercase', letterSpacing: '0.14em',
+          color: 'var(--text-4)', marginBottom: 14,
+        }}>
           {timeLabel}
         </p>
-        <h1
-          className="text-[32px] text-[var(--text)] leading-[1.1] tracking-[-0.03em]"
-          style={{ fontFamily: 'var(--font-instrument-serif, Georgia, serif)', fontWeight: 400 }}
-        >
+        <h1 style={{
+          fontFamily: 'var(--font-serif)',
+          fontSize: 42, fontWeight: 400,
+          lineHeight: 1.08, letterSpacing: '-0.02em',
+          color: 'var(--text)', marginBottom: 16,
+        }}>
           {name ? (
-            <>Welcome, <em style={{ fontStyle: 'italic' }}>{name}.</em></>
+            <>Welcome back,{' '}<em style={{ fontStyle: 'italic', color: 'var(--accent)' }}>{name}.</em></>
           ) : (
-            <>Your workspace<br />awaits.</>
+            <>Your workspace<br />is ready.</>
           )}
         </h1>
-        <p className="text-[13px] text-[var(--text-3)] mt-3 leading-[1.7] max-w-[440px]">
-          Describe a startup idea — AI builds architecture, DB schema, and Cursor build kit in under 60 seconds.
+        <p style={{ fontSize: 15, color: 'var(--text-3)', lineHeight: 1.75, maxWidth: 440 }}>
+          Describe a startup idea — AI builds architecture, DB schema,
+          and a Cursor build kit in under 60 seconds.
         </p>
       </div>
 
-      {/* 3-step flow */}
-      <div className="grid grid-cols-3 gap-3 mb-8 max-w-[680px]">
-        {[
-          {
-            step: '01',
-            label: 'Describe',
-            desc: 'Write your idea in one sentence. Industry, stage, focus area.',
-            icon: (
-              <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
-                <path d="M2 4h12M2 7h8M2 10h10M2 13h6" />
-              </svg>
-            ),
-          },
-          {
-            step: '02',
-            label: 'Generate',
-            desc: 'Claude builds a full blueprint — architecture, schema, revenue model.',
-            icon: (
-              <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
-                <path d="M9 2L4 9h4l-1 5 5-7H8l1-5z"/>
-              </svg>
-            ),
-          },
-          {
-            step: '03',
-            label: 'Ship',
-            desc: 'Get your Cursor rules, build.md and schema.sql — start coding immediately.',
-            icon: (
-              <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
-                <path d="M8 2v8M5 7l3 3 3-3M2 13h12" />
-              </svg>
-            ),
-          },
-        ].map(({ step, label, desc, icon }) => (
+      {/* Steps */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 40 }}>
+        {STEPS.map(({ num, title, body, icon }) => (
           <div
-            key={step}
-            className="bg-[var(--bg-2)] border border-[var(--border)] rounded-[10px] p-5 hover:border-[var(--border-2)] transition-all duration-200 group"
+            key={num}
+            style={{
+              background: 'var(--bg-2)',
+              border: '1px solid var(--border)',
+              borderRadius: 14,
+              padding: '22px 20px',
+              transition: 'border-color 200ms, box-shadow 200ms',
+              cursor: 'default',
+            }}
+            onMouseEnter={e => {
+              const el = e.currentTarget as HTMLElement
+              el.style.borderColor = 'var(--accent-border)'
+              el.style.boxShadow = '0 4px 24px rgba(99,102,241,0.07)'
+            }}
+            onMouseLeave={e => {
+              const el = e.currentTarget as HTMLElement
+              el.style.borderColor = 'var(--border)'
+              el.style.boxShadow = 'none'
+            }}
           >
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-8 h-8 rounded-[7px] bg-[var(--bg-3)] border border-[var(--border)] flex items-center justify-center text-[var(--text-3)] group-hover:text-[var(--accent)] group-hover:bg-[var(--accent-dim)] group-hover:border-[var(--accent-border)] transition-all duration-200">
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18 }}>
+              <div style={{
+                width: 36, height: 36,
+                borderRadius: 10,
+                background: 'var(--bg-3)',
+                border: '1px solid var(--border)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'var(--text-3)',
+              }}>
                 {icon}
               </div>
-              <span className="font-mono text-[10px] text-[var(--text-4)] tracking-[0.08em]">{step}</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-4)', letterSpacing: '0.08em' }}>
+                {num}
+              </span>
             </div>
-            <div className="text-[12px] font-semibold text-[var(--text)] mb-1 tracking-[-0.01em]">{label}</div>
-            <div className="text-[11px] text-[var(--text-3)] leading-[1.6]">{desc}</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 6, letterSpacing: '-0.01em' }}>
+              {title}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-3)', lineHeight: 1.65 }}>
+              {body}
+            </div>
           </div>
         ))}
       </div>
 
       {/* CTA */}
-      <div className="flex items-center gap-3">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <Link
           href="/generate"
-          className="inline-flex items-center gap-2 px-5 py-[9px] bg-[var(--accent)] text-white text-[13px] font-medium rounded-[7px] hover:bg-[var(--accent-hover)] transition-all duration-[100ms] shadow-[0_2px_12px_rgba(99,102,241,0.25)]"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            padding: '10px 22px',
+            background: 'var(--accent)', color: 'white',
+            fontSize: 13, fontWeight: 500,
+            borderRadius: 9,
+            textDecoration: 'none',
+            boxShadow: '0 2px 16px rgba(99,102,241,0.28)',
+            transition: 'all 130ms ease',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.background = 'var(--accent-hover)'
+            ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
+            ;(e.currentTarget as HTMLElement).style.boxShadow = '0 4px 24px rgba(99,102,241,0.36)'
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.background = 'var(--accent)'
+            ;(e.currentTarget as HTMLElement).style.transform = 'none'
+            ;(e.currentTarget as HTMLElement).style.boxShadow = '0 2px 16px rgba(99,102,241,0.28)'
+          }}
         >
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="M8 3v10M3 8h10" />
           </svg>
           Generate first blueprint
         </Link>
-        <span className="font-mono text-[11px] text-[var(--text-4)]">free · no credit card</span>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-4)' }}>
+          free · no card required
+        </span>
       </div>
 
-      {/* Subtle divider + tip */}
-      <div className="mt-10 pt-6 border-t border-[var(--border)]">
-        <p className="font-mono text-[10px] text-[var(--text-4)] tracking-[0.04em]">
-          tip — use <kbd className="font-mono text-[9px] px-[5px] py-[2px] rounded-[3px] bg-[var(--bg-3)] border border-[var(--border-2)] text-[var(--text-3)]">⌘K</kbd> to search blueprints from anywhere
+      {/* Tip */}
+      <div style={{ marginTop: 48, paddingTop: 24, borderTop: '1px solid var(--border)' }}>
+        <p style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-4)', letterSpacing: '0.02em' }}>
+          tip — press{' '}
+          <kbd style={{
+            fontFamily: 'var(--font-mono)', fontSize: 9,
+            padding: '2px 6px', borderRadius: 4,
+            background: 'var(--bg-3)', border: '1px solid var(--border-2)',
+            color: 'var(--text-3)',
+          }}>⌘K</kbd>
+          {' '}to search blueprints from anywhere
         </p>
       </div>
+
     </div>
   )
 }
 
-// ── State B — Has blueprints ──────────────────────────────────────────────────
-
+// ── State B — has blueprints ──────────────────────────────────────────────────
 function WorkspaceView({
   data,
   loading,
@@ -207,28 +249,56 @@ function WorkspaceView({
   const plan = (data?.userMeta?.plan ?? 'free') as string
   const planLimit = PLAN_LIMITS[plan] ?? 10
   const remaining = Math.max(0, planLimit - blueprintCount)
-  const blueprintPct = Math.min((blueprintCount / planLimit) * 100, 100)
+  const usedPct = Math.min((blueprintCount / planLimit) * 100, 100)
+  const barColor = usedPct >= 90 ? '#ef4444' : usedPct >= 70 ? '#eab308' : '#6366f1'
   const name = data?.userMeta?.name ? data.userMeta.name.split(' ')[0] : null
 
   return (
-    <div style={{ animation: 'fadeUp 0.3s ease' }}>
+    <div style={{ animation: 'fadeUp 0.35s ease', maxWidth: 760 }}>
 
       {/* Header */}
-      <div className="flex items-end justify-between mb-7">
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 32 }}>
         <div>
-          <p className="font-mono text-[10px] text-[var(--text-4)] mb-2 uppercase tracking-[0.12em]">
+          <p style={{
+            fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 500,
+            textTransform: 'uppercase', letterSpacing: '0.14em',
+            color: 'var(--text-4)', marginBottom: 10,
+          }}>
             {timeLabel}
           </p>
-          <h1
-            className="text-[26px] text-[var(--text)] leading-[1.1] tracking-[-0.025em]"
-            style={{ fontFamily: 'var(--font-instrument-serif, Georgia, serif)', fontWeight: 400 }}
-          >
-            {name ? `${name}'s workspace` : 'your workspace'}
+          <h1 style={{
+            fontFamily: 'var(--font-serif)',
+            fontSize: 34, fontWeight: 400,
+            lineHeight: 1.1, letterSpacing: '-0.02em',
+            color: 'var(--text)',
+          }}>
+            {name ? (
+              <>{name}&apos;s workspace</>
+            ) : (
+              <>Your workspace</>
+            )}
           </h1>
         </div>
         <Link
           href="/generate"
-          className="inline-flex items-center gap-1.5 px-4 py-[7px] bg-[var(--accent)] text-white text-[12px] font-medium rounded-[7px] hover:bg-[var(--accent-hover)] transition-all duration-[100ms] shrink-0"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 7,
+            padding: '8px 18px',
+            background: 'var(--accent)', color: 'white',
+            fontSize: 13, fontWeight: 500, borderRadius: 9,
+            textDecoration: 'none',
+            boxShadow: '0 2px 12px rgba(99,102,241,0.22)',
+            transition: 'all 130ms ease',
+            flexShrink: 0,
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.background = 'var(--accent-hover)'
+            ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.background = 'var(--accent)'
+            ;(e.currentTarget as HTMLElement).style.transform = 'none'
+          }}
         >
           <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="M8 3v10M3 8h10" />
@@ -237,43 +307,58 @@ function WorkspaceView({
         </Link>
       </div>
 
-      {/* Plan usage bar */}
-      {loading ? (
-        <div className="h-[52px] bg-[var(--bg-2)] border border-[var(--border)] rounded-[8px] animate-pulse mb-5" />
-      ) : (
-        <div className="bg-[var(--bg-2)] border border-[var(--border)] rounded-[8px] px-5 py-3.5 mb-5 flex items-center gap-5 flex-wrap">
-          <div className="flex items-center gap-3 flex-1 min-w-[140px]">
-            <span className="font-mono text-[9px] text-[var(--text-4)] uppercase tracking-[0.1em] shrink-0">
-              Generates
-            </span>
-            <div className="flex-1 h-[2px] bg-[var(--border-2)] rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-[width] duration-700"
-                style={{ width: `${blueprintPct}%`, background: barColor(blueprintPct) }}
-              />
-            </div>
-            <span className="font-mono text-[10px] text-[var(--text)] shrink-0">
-              {blueprintCount}<span className="text-[var(--text-4)]">/{planLimit}</span>
-            </span>
-          </div>
-          <div className="w-px h-3 bg-[var(--border-2)] shrink-0" />
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="font-mono text-[9px] px-2 py-[2px] rounded-[3px] bg-[var(--bg-4)] border border-[var(--border-2)] text-[var(--text-4)] uppercase tracking-[0.08em]">
+      {/* Usage card */}
+      {!loading && (
+        <div style={{
+          background: 'var(--bg-2)',
+          border: '1px solid var(--border)',
+          borderRadius: 14,
+          padding: '18px 22px',
+          marginBottom: 20,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 20,
+          flexWrap: 'wrap',
+        }}>
+          {/* Plan badge */}
+          <div style={{ flexShrink: 0 }}>
+            <span style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 9, fontWeight: 700,
+              textTransform: 'uppercase', letterSpacing: '0.1em',
+              padding: '4px 10px', borderRadius: 6,
+              background: 'var(--accent-dim)',
+              border: '1px solid var(--accent-border)',
+              color: 'var(--accent)',
+            }}>
               {plan}
             </span>
+          </div>
+
+          {/* Progress bar */}
+          <div style={{ flex: 1, minWidth: 120 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                Generates
+              </span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, color: barColor }}>
+                {blueprintCount}<span style={{ color: 'var(--text-4)', fontWeight: 400 }}>/{planLimit}</span>
+              </span>
+            </div>
+            <div style={{ height: 4, background: 'var(--border-2)', borderRadius: 99, overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${usedPct}%`, background: barColor, borderRadius: 99, transition: 'width 0.7s ease' }} />
+            </div>
+          </div>
+
+          {/* Remaining / upgrade */}
+          <div style={{ flexShrink: 0 }}>
             {remaining === 0 ? (
-              <Link
-                href="/billing"
-                className="font-mono text-[10px] text-[var(--red)] hover:opacity-70 transition-opacity"
-              >
+              <Link href="/billing" style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#ef4444', textDecoration: 'none', fontWeight: 500 }}>
                 Limit reached · Upgrade →
               </Link>
             ) : (
-              <Link
-                href="/billing"
-                className="font-mono text-[10px] text-[var(--accent)] hover:opacity-70 transition-opacity"
-              >
-                {remaining} left · Upgrade →
+              <Link href="/billing" style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)', textDecoration: 'none' }}>
+                {remaining} left · <span style={{ color: 'var(--accent)' }}>Upgrade →</span>
               </Link>
             )}
           </div>
@@ -282,96 +367,116 @@ function WorkspaceView({
 
       {/* Recent blueprints */}
       {loading ? (
-        <div className="bg-[var(--bg-2)] border border-[var(--border)] rounded-[10px] overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
-            <Skeleton width={140} height={12} />
-            <Skeleton width={60} height={10} />
-          </div>
-          {[1, 2, 3, 4].map((i) => <SkeletonRow key={i} />)}
+        <div style={{ background: 'var(--bg-2)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
+          {[1,2,3,4].map(i => (
+            <div key={i} style={{ padding: '14px 22px', borderBottom: '1px solid var(--border)', display: 'flex', gap: 12 }}>
+              <Skeleton width="40%" height={13} />
+              <Skeleton width="15%" height={13} />
+              <Skeleton width="10%" height={13} />
+              <Skeleton width="12%" height={13} />
+            </div>
+          ))}
         </div>
       ) : data && data.recentBlueprints.length > 0 ? (
-        <div className="bg-[var(--bg-2)] border border-[var(--border)] rounded-[10px] overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-[var(--border)]">
-            <span className="text-[12px] font-semibold text-[var(--text)] tracking-[-0.01em]">Recent blueprints</span>
-            <Link
-              href="/library"
-              className="font-mono text-[10px] text-[var(--accent)] hover:opacity-70 transition-opacity"
-            >
+        <div style={{ background: 'var(--bg-2)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
+
+          {/* Table header */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '14px 22px',
+            borderBottom: '1px solid var(--border)',
+          }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', letterSpacing: '-0.01em' }}>
+              Recent blueprints
+            </span>
+            <Link href="/library" style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--accent)', textDecoration: 'none' }}>
               View all →
             </Link>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b border-[var(--border)]">
-                  {['project', 'industry', 'score', 'status', 'created'].map((h) => (
-                    <th
-                      key={h}
-                      className="px-5 py-2 text-left font-mono text-[9px] font-normal text-[var(--text-4)] uppercase tracking-[0.1em] whitespace-nowrap"
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {data.recentBlueprints.slice(0, 6).map((bp) => {
-                  const { variant, label, pulse } = statusBadge(bp.status)
-                  return (
-                    <tr
-                      key={bp.id}
-                      onClick={() => router.push(`/generate/${bp.id}`)}
-                      className="border-b border-[var(--border)] last:border-b-0 hover:bg-[var(--bg-3)] cursor-pointer transition-colors duration-[80ms] group"
-                    >
-                      <td className="px-5 py-3">
-                        <span className="text-[13px] font-medium text-[var(--text)] group-hover:text-[var(--accent)] transition-colors duration-[80ms]">
-                          {bp.title}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3 whitespace-nowrap">
-                        <Badge variant="indigo">{bp.industry ?? 'SaaS'}</Badge>
-                      </td>
-                      <td className="px-5 py-3 whitespace-nowrap">
-                        {bp.score_total !== null ? (
-                          <ScoreBar score={bp.score_total} />
-                        ) : (
-                          <span className="text-[var(--text-4)] font-mono text-[11px]">—</span>
-                        )}
-                      </td>
-                      <td className="px-5 py-3 whitespace-nowrap">
-                        <Badge variant={variant} pulse={pulse}>{label}</Badge>
-                      </td>
-                      <td className="px-5 py-3 font-mono text-[11px] text-[var(--text-4)] whitespace-nowrap">
-                        {timeAgo(bp.created_at)}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+
+          {/* Column headers */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 100px 72px 90px 90px',
+            padding: '6px 22px',
+            borderBottom: '1px solid var(--border)',
+          }}>
+            {['project', 'industry', 'score', 'status', 'created'].map(h => (
+              <span key={h} style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                {h}
+              </span>
+            ))}
           </div>
-          {/* Footer hint */}
-          <div className="px-5 py-3 border-t border-[var(--border)] flex items-center justify-between">
-            <span className="font-mono text-[10px] text-[var(--text-4)]">
+
+          {/* Rows */}
+          {data.recentBlueprints.slice(0, 7).map((bp, i) => (
+            <div
+              key={bp.id}
+              onClick={() => router.push(`/generate/${bp.id}`)}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 100px 72px 90px 90px',
+                padding: '13px 22px',
+                borderBottom: i < 6 ? '1px solid var(--border)' : 'none',
+                cursor: 'pointer',
+                transition: 'background 80ms',
+                alignItems: 'center',
+              }}
+              onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--bg-3)'}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+            >
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: 12 }}>
+                {bp.title}
+              </span>
+              <span style={{
+                display: 'inline-block',
+                fontFamily: 'var(--font-mono)', fontSize: 10,
+                color: 'var(--accent)', background: 'var(--accent-dim)',
+                border: '1px solid var(--accent-border)',
+                borderRadius: 5, padding: '2px 8px',
+                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                maxWidth: 90,
+              }}>
+                {bp.industry ?? 'SaaS'}
+              </span>
+              <span>
+                {bp.score_total !== null ? <ScoreChip score={bp.score_total} /> : <span style={{ color: 'var(--text-4)', fontFamily: 'var(--font-mono)', fontSize: 11 }}>—</span>}
+              </span>
+              <StatusDot status={bp.status} />
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-4)', whiteSpace: 'nowrap' }}>
+                {timeAgo(bp.created_at)}
+              </span>
+            </div>
+          ))}
+
+          {/* Footer */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '11px 22px',
+            borderTop: '1px solid var(--border)',
+            background: 'var(--bg-3)',
+          }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-4)' }}>
               {data.stats.blueprints} total · {data.recentBlueprints.filter(b => b.status === 'complete').length} ready
             </span>
-            <Link
-              href="/generate"
-              className="font-mono text-[10px] text-[var(--text-3)] hover:text-[var(--accent)] transition-colors"
-            >
+            <Link href="/generate" style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-3)', textDecoration: 'none' }}>
               + new blueprint
             </Link>
           </div>
+
         </div>
       ) : (
-        /* Empty within State B — shouldn't happen but fallback */
-        <div className="bg-[var(--bg-2)] border border-[var(--border)] rounded-[10px] px-5 py-10 text-center">
-          <p className="text-[13px] text-[var(--text-3)] mb-3">No blueprints yet.</p>
-          <Link
-            href="/generate"
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[var(--accent)] text-white text-[12px] font-medium rounded-[6px] hover:bg-[var(--accent-hover)] transition-colors"
-          >
-            Generate first
+        <div style={{
+          background: 'var(--bg-2)', border: '1px solid var(--border)', borderRadius: 14,
+          padding: '48px 24px', textAlign: 'center',
+        }}>
+          <p style={{ fontSize: 14, color: 'var(--text-3)', marginBottom: 16 }}>No blueprints yet.</p>
+          <Link href="/generate" style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            padding: '8px 18px', background: 'var(--accent)', color: 'white',
+            fontSize: 13, fontWeight: 500, borderRadius: 8, textDecoration: 'none',
+          }}>
+            Generate first blueprint
           </Link>
         </div>
       )}
@@ -380,8 +485,7 @@ function WorkspaceView({
   )
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
-
+// ── Main ──────────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
   const { data, isLoading: loading, error: queryError, refetch } = useAnalyticsOverview()
   const router = useRouter()
@@ -395,21 +499,13 @@ export default function DashboardPage() {
   const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
   const timeLabel = `${weekday} ${day} ${month} · ${time}`
 
-  if (error) {
-    return <ErrorState message={error} onRetry={fetchOverview} />
-  }
+  if (error) return <ErrorState message={error} onRetry={fetchOverview} />
+  if (loading) return <DashboardSkeleton />
 
-  // Loading — show skeleton
-  if (loading) {
-    return <DashboardSkeleton />
-  }
-
-  // State A — first visit, no blueprints
   if (data && data.recentBlueprints.length === 0) {
     const name = data.userMeta?.name ? data.userMeta.name.split(' ')[0] : null
     return <OnboardingView name={name} timeLabel={timeLabel} />
   }
 
-  // State B — has blueprints
   return <WorkspaceView data={data} loading={loading} router={router} timeLabel={timeLabel} />
 }

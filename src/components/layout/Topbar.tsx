@@ -19,29 +19,10 @@ const BREADCRUMBS: Record<string, string> = {
 }
 
 function getBasePath(pathname: string): string {
-  const parts = pathname.split('/')
-  return '/' + (parts[1] ?? '')
+  return '/' + (pathname.split('/')[1] ?? '')
 }
 
-function NewBlueprintButton() {
-  return (
-    <Link
-      href="/generate"
-      className="inline-flex items-center gap-1.5 px-3.5 py-[6px] bg-[var(--accent)] text-white border border-[var(--accent)] rounded-[var(--radius)] text-[12px] font-medium hover:bg-[var(--accent-hover)] hover:border-[var(--accent-hover)] transition-all duration-[100ms] whitespace-nowrap"
-    >
-      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
-        <path d="M8 3v10M3 8h10" />
-      </svg>
-      <span className="hidden sm:inline">New Blueprint</span>
-    </Link>
-  )
-}
-
-const PAGE_ACTIONS: Record<string, React.ReactNode> = {
-  '/generate':  <NewBlueprintButton />,
-  '/dashboard': <NewBlueprintButton />,
-  '/library':   <NewBlueprintButton />,
-}
+const PLAN_LIMITS: Record<string, number> = { free: 10, pro: 30, team: 150 }
 
 export default function Topbar({ user }: TopbarProps) {
   const pathname = usePathname()
@@ -49,18 +30,16 @@ export default function Topbar({ user }: TopbarProps) {
   const { toggleMobileSidebar } = useUiStore()
   const searchRef = useRef<HTMLInputElement>(null)
   const [searchVal, setSearchVal] = useState('')
-  const [usage, setUsage] = useState<{ remaining: number; limit: number; plan: string } | null>(null)
+  const [usage, setUsage] = useState<{ remaining: number; plan: string } | null>(null)
 
   const basePath = getBasePath(pathname)
   const pageName = BREADCRUMBS[basePath] ?? ''
-  const action = PAGE_ACTIONS[basePath]
 
-  const PLAN_LIMITS: Record<string, number> = { free: 10, pro: 30, team: 150 }
   const planLimit = PLAN_LIMITS[user.plan] ?? 10
   const usedCount = user.blueprint_count ?? 0
   const remaining = usage?.remaining ?? Math.max(0, planLimit - usedCount)
   const usagePct = Math.min(Math.round(((planLimit - remaining) / planLimit) * 100), 100)
-  const usageColor = usagePct >= 90 ? 'var(--red)' : usagePct >= 70 ? 'var(--yellow)' : 'var(--accent)'
+  const usageColor = usagePct >= 90 ? '#ef4444' : usagePct >= 70 ? '#eab308' : '#6366f1'
   const planLabel = ({ free: 'FREE', pro: 'PRO', team: 'TEAM' } as Record<string, string>)[user.plan] ?? user.plan.toUpperCase()
 
   useEffect(() => {
@@ -70,7 +49,6 @@ export default function Topbar({ user }: TopbarProps) {
       .catch(() => {})
   }, [])
 
-  // ⌘K / Ctrl+K focuses the search input
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -98,56 +76,62 @@ export default function Topbar({ user }: TopbarProps) {
   }
 
   return (
-    <header
-      className="h-14 min-h-14 border-b border-[var(--border)] flex items-center px-4 md:px-5 gap-3 shrink-0 z-[9]"
-      style={{ backgroundColor: 'var(--panel)' }}
-    >
+    <header style={{
+      height: 52,
+      minHeight: 52,
+      borderBottom: '1px solid var(--border)',
+      background: 'var(--bg-2)',
+      display: 'flex',
+      alignItems: 'center',
+      padding: '0 20px',
+      gap: 12,
+      flexShrink: 0,
+      zIndex: 9,
+    }}>
+
       {/* Mobile hamburger */}
       <button
         onClick={toggleMobileSidebar}
-        className="md:hidden w-8 h-8 flex items-center justify-center rounded-[var(--radius)] border border-[var(--border)] text-[var(--text-3)] hover:bg-[var(--bg-3)] hover:text-[var(--text-2)] transition-all shrink-0"
-        aria-label="Toggle navigation menu"
+        className="md:hidden"
+        style={{
+          width: 32, height: 32,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          borderRadius: 7,
+          border: '1px solid var(--border)',
+          background: 'transparent',
+          color: 'var(--text-3)',
+          cursor: 'pointer',
+          flexShrink: 0,
+        }}
+        aria-label="Toggle navigation"
       >
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
           <path d="M2 4h12M2 8h12M2 12h12" />
         </svg>
       </button>
 
       {/* Breadcrumb */}
-      {pageName ? (
-        <div className="hidden md:flex items-center gap-1.5 shrink-0">
-          <span
-            style={{
-              fontFamily: "'Geist Mono', monospace",
-              fontSize: '11px',
-              color: 'var(--text-4)',
-              letterSpacing: '0.04em',
-            }}
-          >
+      {pageName && (
+        <div className="hidden md:flex" style={{ alignItems: 'center', gap: 6, flexShrink: 0 }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-4)', letterSpacing: '0.05em' }}>
             SMD
           </span>
-          <span style={{ color: 'var(--text-4)', fontSize: '11px' }}>/</span>
-          <span
-            style={{
-              fontFamily: "'Geist', system-ui, sans-serif",
-              fontSize: '12px',
-              fontWeight: 500,
-              color: 'var(--text-2)',
-            }}
-          >
+          <span style={{ color: 'var(--border-2)', fontSize: 12 }}>/</span>
+          <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-3)' }}>
             {pageName}
           </span>
         </div>
-      ) : null}
+      )}
 
       {/* Search */}
       <form
         onSubmit={handleSearchSubmit}
-        className="relative ml-0 md:ml-3 flex-1 max-w-[180px] sm:max-w-[240px]"
+        style={{ position: 'relative', flex: 1, maxWidth: 220 }}
+        className="ml-0 md:ml-2"
       >
         <svg
-          className="absolute left-[9px] top-1/2 -translate-y-1/2 text-[var(--text-4)] pointer-events-none"
-          width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"
+          style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-4)', pointerEvents: 'none' }}
+          width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"
         >
           <circle cx="6.5" cy="6.5" r="4.5" />
           <path d="M10 10l3.5 3.5" />
@@ -156,74 +140,94 @@ export default function Topbar({ user }: TopbarProps) {
           ref={searchRef}
           type="text"
           value={searchVal}
-          onChange={(e) => setSearchVal(e.target.value)}
+          onChange={e => setSearchVal(e.target.value)}
           placeholder="Search blueprints..."
           style={{
             width: '100%',
-            backgroundColor: 'var(--bg-3)',
+            background: 'var(--bg-3)',
             border: '1px solid var(--border)',
-            borderRadius: 'var(--radius)',
-            padding: '5px 48px 5px 30px',
-            fontSize: '12px',
+            borderRadius: 7,
+            padding: '5px 36px 5px 30px',
+            fontSize: 12,
             color: 'var(--text)',
             outline: 'none',
-            transition: 'all 150ms ease',
           }}
-          className="placeholder:text-[var(--text-4)] focus:border-[var(--border-2)] focus:bg-[var(--bg-4)]"
+          className="placeholder:text-[var(--text-4)] focus:border-[var(--border-2)]"
         />
-        <kbd
-          className="absolute right-[8px] top-1/2 -translate-y-1/2 pointer-events-none"
-          style={{
-            fontFamily: "'Geist Mono', monospace",
-            fontSize: '9px',
-            color: 'var(--text-4)',
-            backgroundColor: 'var(--bg-4)',
-            border: '1px solid var(--border)',
-            borderRadius: '3px',
-            padding: '2px 5px',
-          }}
-        >
+        <kbd style={{
+          position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
+          fontFamily: 'var(--font-mono)', fontSize: 9,
+          color: 'var(--text-4)', background: 'var(--bg-4)',
+          border: '1px solid var(--border)', borderRadius: 3, padding: '1px 4px',
+          pointerEvents: 'none',
+        }}>
           ⌘K
         </kbd>
       </form>
 
-      {/* Right side */}
-      <div className="ml-auto flex items-center gap-2">
-        {/* Generates remaining pill */}
+      {/* Right */}
+      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+
+        {/* Usage pill */}
         <Link
           href="/billing"
-          className="hidden sm:flex items-center gap-1.5 font-mono bg-[var(--bg-3)] border border-[var(--border)] rounded-full px-3 py-1 no-underline hover:border-[var(--border-2)] transition-all duration-100"
-          style={{ fontSize: '9px' }}
-          title={`${remaining} generates remaining on ${planLabel} plan`}
+          className="hidden sm:flex"
+          style={{
+            alignItems: 'center',
+            gap: 7,
+            padding: '4px 10px',
+            borderRadius: 99,
+            background: 'var(--bg-3)',
+            border: '1px solid var(--border)',
+            textDecoration: 'none',
+            transition: 'border-color 100ms',
+          }}
+          onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-2)'}
+          onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'}
         >
-          <span style={{ color: 'var(--text-4)' }}>{planLabel}</span>
-          <div className="w-8 h-[3px] bg-[var(--border-2)] rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all duration-500"
-              style={{ width: `${usagePct}%`, background: usageColor }}
-            />
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-4)', letterSpacing: '0.06em' }}>
+            {planLabel}
+          </span>
+          <div style={{ width: 28, height: 3, background: 'var(--border-2)', borderRadius: 99, overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${usagePct}%`, background: usageColor, borderRadius: 99, transition: 'width 0.5s' }} />
           </div>
-          <span style={{ color: usageColor }}>{remaining} left</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: usageColor, fontWeight: 600, whiteSpace: 'nowrap' }}>
+            {remaining} left
+          </span>
         </Link>
 
-        {/* Notifications */}
-        <button
-          className="w-8 h-8 flex items-center justify-center text-[var(--text-3)] hover:bg-[var(--bg-3)] hover:text-[var(--text-2)] hover:border-[var(--border-2)] transition-all duration-[100ms]"
+        {/* New Blueprint */}
+        <Link
+          href="/generate"
           style={{
-            borderRadius: 'var(--radius)',
-            border: '1px solid var(--border)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '6px 14px',
+            background: 'var(--accent)',
+            color: 'white',
+            borderRadius: 8,
+            fontSize: 12,
+            fontWeight: 500,
+            textDecoration: 'none',
+            transition: 'all 120ms ease',
+            whiteSpace: 'nowrap',
           }}
-          aria-label="Notifications"
-          title="Notifications"
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.background = 'var(--accent-hover)'
+            ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.background = 'var(--accent)'
+            ;(e.currentTarget as HTMLElement).style.transform = 'none'
+          }}
         >
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M8 2a4.5 4.5 0 014.5 4.5c0 2.3.55 3.8 1.3 4.7H2.2c.75-.9 1.3-2.4 1.3-4.7A4.5 4.5 0 018 2z" />
-            <path d="M6.5 12.5a1.5 1.5 0 003 0" />
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M8 3v10M3 8h10" />
           </svg>
-        </button>
+          <span className="hidden sm:inline">New Blueprint</span>
+        </Link>
 
-        {/* Page action */}
-        {action}
       </div>
     </header>
   )

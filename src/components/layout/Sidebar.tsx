@@ -11,12 +11,12 @@ interface SidebarProps {
   user: DbUser
 }
 
-const NAV_MAIN = [
+const NAV = [
   {
     href: '/dashboard',
     label: 'Dashboard',
     icon: (
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" className="w-[15px] h-[15px] shrink-0">
         <rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1.5" />
         <rect x="9" y="1.5" width="5.5" height="5.5" rx="1.5" />
         <rect x="1.5" y="9" width="5.5" height="5.5" rx="1.5" />
@@ -27,10 +27,10 @@ const NAV_MAIN = [
   {
     href: '/generate',
     label: 'Generate',
-    badge: 'NEW',
+    badge: 'AI',
     icon: (
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0">
-        <path d="M9 2L11.5 7H14L10 10.5L11.5 14L8 11.5L4.5 14L6 10.5L2 7H4.5L7 2H9Z" />
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" className="w-[15px] h-[15px] shrink-0">
+        <path d="M9 1.5L4.5 8.5H8L7 14.5L12 7H8.5L9 1.5Z" />
       </svg>
     ),
   },
@@ -38,22 +38,22 @@ const NAV_MAIN = [
     href: '/library',
     label: 'My Blueprints',
     icon: (
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" className="w-[15px] h-[15px] shrink-0">
         <rect x="2" y="2" width="12" height="12" rx="2" />
-        <path d="M5 6h6M5 9h4" />
+        <path d="M5 5.5h6M5 8h4.5M5 10.5h3" />
       </svg>
     ),
   },
 ]
 
-const NAV_WORKSPACE = [
+const NAV_BOTTOM = [
   {
     href: '/billing',
     label: 'Plan & Billing',
     icon: (
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" className="w-[15px] h-[15px] shrink-0">
         <rect x="1.5" y="3.5" width="13" height="9" rx="1.5" />
-        <path d="M1.5 7h13M4.5 10.5h3" />
+        <path d="M1.5 6.5h13M4.5 10h3" />
       </svg>
     ),
   },
@@ -61,7 +61,7 @@ const NAV_WORKSPACE = [
     href: '/settings',
     label: 'Settings',
     icon: (
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" className="w-[15px] h-[15px] shrink-0">
         <circle cx="8" cy="8" r="2.5" />
         <path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4" />
       </svg>
@@ -69,122 +69,14 @@ const NAV_WORKSPACE = [
   },
 ]
 
-// Plan badge stilleri
-const PLAN_LABELS: Record<string, string> = {
-  free:   'Free',
-  solo:   'Solo',
-  pro:    'Pro',
-  scale:  'Scale',
-  agency: 'Agency',
-}
-
-type PlanStyle = { color: string; background: string; border: string }
-
-const PLAN_BADGE_STYLES: Record<string, PlanStyle> = {
-  free: {
-    color:      'var(--text-4)',
-    background: 'var(--bg-4)',
-    border:     'var(--border)',
-  },
-  solo: {
-    color:      'var(--accent)',
-    background: 'var(--accent-dim)',
-    border:     'var(--accent-border)',
-  },
-  pro: {
-    color:      'var(--accent)',
-    background: 'var(--accent-dim)',
-    border:     'var(--accent-border)',
-  },
-  scale: {
-    color:      'var(--purple)',
-    background: 'rgba(139,92,246,0.10)',
-    border:     'rgba(139,92,246,0.25)',
-  },
-  agency: {
-    color:      'var(--purple)',
-    background: 'rgba(139,92,246,0.10)',
-    border:     'rgba(139,92,246,0.25)',
-  },
-}
-
-const DEFAULT_PLAN_STYLE: PlanStyle = {
-  color:      'var(--text-4)',
-  background: 'var(--bg-4)',
-  border:     'var(--border)',
-}
-
-function NavSection({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="mb-1">
-      <div style={{ paddingLeft: '8px', marginTop: '16px', marginBottom: '4px' }}>
-        <span
-          style={{
-            fontFamily: "'Geist Mono', monospace",
-            fontSize: '9px',
-            fontWeight: 500,
-            textTransform: 'uppercase',
-            letterSpacing: '0.1em',
-            color: 'var(--text-3)',
-          }}
-        >
-          {title}
-        </span>
-      </div>
-      {children}
-    </div>
-  )
-}
-
-function NavItem({
-  href,
-  label,
-  icon,
-  badge,
-  active,
-  onClick,
-}: {
-  href: string
-  label: string
-  icon: React.ReactNode
-  badge?: string
-  active: boolean
-  onClick?: () => void
-}) {
-  return (
-    <Link
-      href={href}
-      onClick={onClick}
-      className={[
-        'group relative flex items-center gap-2.5 py-[6px] rounded-[var(--radius)] text-[13px] mb-[1px] whitespace-nowrap transition-all duration-[120ms] no-underline leading-none',
-        // active item: borderLeft 2px olduğu için pl-[10px] (12-2=10), inactive: pl-3
-        active
-          ? 'pr-3 pl-[10px] bg-[var(--accent-dim)] text-[var(--accent)] font-medium border-l-2 border-l-[var(--accent)]'
-          : 'px-3 text-[var(--text-3)] hover:bg-[var(--bg-3)] hover:text-[var(--text)]',
-      ].join(' ')}
-    >
-      <span className={[
-        'shrink-0 transition-all duration-[120ms]',
-        active ? 'text-[var(--accent)]' : 'text-[var(--text-4)] group-hover:text-[var(--text-3)]',
-      ].join(' ')}>
-        {icon}
-      </span>
-      <span className="truncate">{label}</span>
-      {badge && (
-        <span className="ml-auto font-mono text-[9px] bg-[var(--accent-dim)] text-[var(--accent)] rounded-full px-1.5 py-[1px] shrink-0">
-          {badge}
-        </span>
-      )}
-    </Link>
-  )
-}
+const PLAN_LIMITS: Record<string, number> = { free: 10, pro: 30, team: 150 }
 
 export default function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
   const { mobileSidebarOpen, setMobileSidebarOpen } = useUiStore()
-  const [usage, setUsage] = React.useState<{ used: number; limit: number; remaining: number } | null>(null)
+  const [usage, setUsage] = React.useState<{ remaining: number; limit: number } | null>(null)
 
   React.useEffect(() => {
     fetch('/api/usage')
@@ -193,12 +85,12 @@ export default function Sidebar({ user }: SidebarProps) {
       .catch(() => {})
   }, [])
 
-  const PLAN_LIMITS: Record<string, number> = { free: 10, pro: 30, team: 150 }
   const planLimit = PLAN_LIMITS[user.plan] ?? 10
   const usedCount = user.blueprint_count ?? 0
-  const remaining = Math.max(0, (usage?.remaining ?? (planLimit - usedCount)))
-  const usagePct = Math.min(Math.round(((planLimit - remaining) / planLimit) * 100), 100)
-  const usageBarColor = usagePct >= 90 ? 'var(--red)' : usagePct >= 70 ? 'var(--yellow)' : 'var(--accent)'
+  const remaining = usage?.remaining ?? Math.max(0, planLimit - usedCount)
+  const usedCount2 = planLimit - remaining
+  const usagePct = Math.min(Math.round((usedCount2 / planLimit) * 100), 100)
+  const usageColor = usagePct >= 90 ? '#ef4444' : usagePct >= 70 ? '#eab308' : '#6366f1'
 
   const displayName = user.full_name ?? user.email.split('@')[0] ?? 'User'
   const initials = displayName
@@ -220,168 +112,299 @@ export default function Sidebar({ user }: SidebarProps) {
     return pathname === href || pathname.startsWith(href + '/')
   }
 
-  function handleNavClick() {
-    setMobileSidebarOpen(false)
-  }
-
-  const planStyle = PLAN_BADGE_STYLES[user.plan] ?? DEFAULT_PLAN_STYLE
+  const planLabel = ({ free: 'Free', pro: 'Pro', team: 'Team' } as Record<string, string>)[user.plan] ?? user.plan
 
   const sidebarContent = (
-    <>
-      {/* Logo */}
-      <div className="h-14 flex items-center px-4 border-b border-[var(--border)] shrink-0">
-        <span
-          style={{
-            fontFamily: "'Geist Mono', monospace",
-            fontSize: '13px',
-            fontWeight: 500,
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+
+      {/* ── Logo ───────────────────────────────── */}
+      <div style={{
+        padding: '20px 20px 16px',
+        borderBottom: '1px solid var(--border)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{
+            width: 28, height: 28,
+            background: 'var(--accent)',
+            borderRadius: 7,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="white" strokeWidth="1.8">
+              <path d="M3 4h10M3 8h7M3 12h8" />
+            </svg>
+          </div>
+          <span style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 13,
+            fontWeight: 600,
             letterSpacing: '-0.02em',
             color: 'var(--text)',
-          }}
-        >
-          System<span style={{ color: 'var(--accent)' }}>MD</span>
-        </span>
-        <span
-          className="ml-auto"
-          style={{
-            fontFamily: "'Geist Mono', monospace",
-            fontSize: '9px',
+          }}>
+            System<span style={{ color: 'var(--accent)' }}>MD</span>
+          </span>
+          <span style={{
+            marginLeft: 'auto',
+            fontFamily: 'var(--font-mono)',
+            fontSize: 9,
             color: 'var(--text-4)',
-            backgroundColor: 'var(--bg-4)',
+            background: 'var(--bg-3)',
             border: '1px solid var(--border)',
-            borderRadius: '4px',
-            padding: '2px 5px',
-          }}
-        >
-          beta
-        </span>
+            borderRadius: 4,
+            padding: '2px 6px',
+            letterSpacing: '0.04em',
+          }}>
+            beta
+          </span>
+        </div>
       </div>
 
-      {/* Nav */}
-      <nav
-        className="flex-1 px-2 py-2 overflow-y-auto [&::-webkit-scrollbar]:hidden"
-        onClick={handleNavClick}
-      >
-        {NAV_MAIN.map((item) => (
-          <NavItem key={item.href} {...item} active={isActive(item.href)} onClick={handleNavClick} />
-        ))}
-
-        <NavSection title="Workspace">
-          {NAV_WORKSPACE.map((item) => (
-            <NavItem key={item.href} {...item} active={isActive(item.href)} onClick={handleNavClick} />
-          ))}
-        </NavSection>
+      {/* ── Main Nav ───────────────────────────── */}
+      <nav style={{ padding: '12px 10px 0', flexShrink: 0 }} onClick={() => setMobileSidebarOpen(false)}>
+        {NAV.map(item => {
+          const active = isActive(item.href)
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 9,
+                padding: '8px 10px',
+                borderRadius: 8,
+                marginBottom: 2,
+                fontSize: 13,
+                fontWeight: active ? 500 : 400,
+                color: active ? 'var(--accent)' : 'var(--text-3)',
+                background: active ? 'var(--accent-dim)' : 'transparent',
+                borderLeft: active ? '2px solid var(--accent)' : '2px solid transparent',
+                textDecoration: 'none',
+                transition: 'all 120ms ease',
+                paddingLeft: active ? 8 : 10,
+              }}
+              onMouseEnter={e => {
+                if (!active) {
+                  (e.currentTarget as HTMLElement).style.background = 'var(--bg-3)'
+                  ;(e.currentTarget as HTMLElement).style.color = 'var(--text-2)'
+                }
+              }}
+              onMouseLeave={e => {
+                if (!active) {
+                  (e.currentTarget as HTMLElement).style.background = 'transparent'
+                  ;(e.currentTarget as HTMLElement).style.color = 'var(--text-3)'
+                }
+              }}
+            >
+              <span style={{ color: active ? 'var(--accent)' : 'var(--text-4)', flexShrink: 0, transition: 'color 120ms' }}>
+                {item.icon}
+              </span>
+              <span style={{ flex: 1 }}>{item.label}</span>
+              {item.badge && (
+                <span style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 8,
+                  fontWeight: 600,
+                  letterSpacing: '0.08em',
+                  color: 'var(--accent)',
+                  background: 'var(--accent-dim)',
+                  border: '1px solid var(--accent-border)',
+                  borderRadius: 4,
+                  padding: '1px 5px',
+                }}>
+                  {item.badge}
+                </span>
+              )}
+            </Link>
+          )
+        })}
       </nav>
 
-      {/* Usage Widget */}
+      {/* ── Spacer ─────────────────────────────── */}
+      <div style={{ flex: 1 }} />
+
+      {/* ── Usage Widget ───────────────────────── */}
+      <div style={{ padding: '0 10px 10px' }}>
+        <div style={{
+          background: 'var(--bg-3)',
+          border: '1px solid var(--border)',
+          borderRadius: 10,
+          padding: '12px 14px',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <span style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 9,
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              color: 'var(--text-4)',
+            }}>
+              Generates used
+            </span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, color: usageColor }}>
+              {usedCount2}<span style={{ color: 'var(--text-4)', fontWeight: 400 }}>/{planLimit}</span>
+            </span>
+          </div>
+          <div style={{ height: 3, background: 'var(--border-2)', borderRadius: 99, overflow: 'hidden', marginBottom: 8 }}>
+            <div style={{
+              height: '100%',
+              width: `${usagePct}%`,
+              background: usageColor,
+              borderRadius: 99,
+              transition: 'width 0.6s ease',
+            }} />
+          </div>
+          <div style={{ fontSize: 10, color: 'var(--text-4)', lineHeight: 1.4 }}>
+            {remaining === 0 ? (
+              <Link href="/billing" style={{ color: 'var(--accent)', textDecoration: 'none', fontWeight: 500 }}>
+                Upgrade plan →
+              </Link>
+            ) : (
+              <span>
+                {remaining} remaining on <span style={{ color: 'var(--text-3)', textTransform: 'capitalize' }}>{planLabel}</span>
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Bottom Nav ─────────────────────────── */}
+      <div style={{ padding: '0 10px 8px', borderTop: '1px solid var(--border)', paddingTop: 8 }}>
+        {NAV_BOTTOM.map(item => {
+          const active = isActive(item.href)
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setMobileSidebarOpen(false)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 9,
+                padding: '7px 10px',
+                borderRadius: 7,
+                marginBottom: 1,
+                fontSize: 12,
+                fontWeight: active ? 500 : 400,
+                color: active ? 'var(--accent)' : 'var(--text-4)',
+                background: active ? 'var(--accent-dim)' : 'transparent',
+                textDecoration: 'none',
+                transition: 'all 100ms ease',
+              }}
+              onMouseEnter={e => {
+                if (!active) {
+                  (e.currentTarget as HTMLElement).style.background = 'var(--bg-3)'
+                  ;(e.currentTarget as HTMLElement).style.color = 'var(--text-3)'
+                }
+              }}
+              onMouseLeave={e => {
+                if (!active) {
+                  (e.currentTarget as HTMLElement).style.background = 'transparent'
+                  ;(e.currentTarget as HTMLElement).style.color = 'var(--text-4)'
+                }
+              }}
+            >
+              {item.icon}
+              {item.label}
+            </Link>
+          )
+        })}
+      </div>
+
+      {/* ── User Row ───────────────────────────── */}
       <div style={{
-        margin: '0 8px 8px',
+        margin: '0 10px 12px',
         padding: '10px 12px',
         background: 'var(--bg-3)',
         border: '1px solid var(--border)',
-        borderRadius: '8px',
-        flexShrink: 0,
+        borderRadius: 10,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-3)' }}>
-            Generates
-          </span>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 600, color: usageBarColor }}>
-            {remaining}/{planLimit}
-          </span>
+        <div style={{
+          width: 30, height: 30,
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, var(--accent), var(--purple))',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 11, fontWeight: 600, color: 'white',
+          flexShrink: 0, letterSpacing: '-0.01em',
+        }}>
+          {initials}
         </div>
-        <div style={{ height: 4, background: 'var(--bg-4)', borderRadius: 99, overflow: 'hidden' }}>
-          <div style={{
-            height: '100%',
-            width: `${usagePct}%`,
-            background: usageBarColor,
-            borderRadius: 99,
-            transition: 'width 0.4s ease',
-          }} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.3 }}>
+            {displayName}
+          </div>
+          <div style={{ fontSize: 10, color: 'var(--text-4)', marginTop: 1, fontFamily: 'var(--font-mono)', textTransform: 'capitalize' }}>
+            {planLabel} plan
+          </div>
         </div>
-        <div style={{ marginTop: 6, fontSize: '10px', color: 'var(--text-3)' }}>
-          {remaining === 0 ? (
-            <Link href="/billing" style={{ color: 'var(--accent)', textDecoration: 'none', fontWeight: 500 }}>
-              Upgrade for more →
-            </Link>
-          ) : (
-            <span>{remaining} left on <span style={{ textTransform: 'capitalize' }}>{user.plan}</span> plan</span>
-          )}
-        </div>
+        <button
+          onClick={handleSignOut}
+          title="Sign out"
+          style={{
+            width: 26, height: 26,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            borderRadius: 6,
+            border: '1px solid var(--border)',
+            background: 'transparent',
+            color: 'var(--text-4)',
+            cursor: 'pointer',
+            transition: 'all 100ms ease',
+            flexShrink: 0,
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.background = 'var(--bg-4)'
+            ;(e.currentTarget as HTMLElement).style.color = 'var(--text-3)'
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.background = 'transparent'
+            ;(e.currentTarget as HTMLElement).style.color = 'var(--text-4)'
+          }}
+        >
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6">
+            <path d="M10 3h3a1 1 0 011 1v8a1 1 0 01-1 1h-3M6.5 5.5L10 8l-3.5 2.5M1 8h9" />
+          </svg>
+        </button>
       </div>
 
-      {/* User + Sign out */}
-      <div className="border-t border-[var(--border)] shrink-0">
-        <div className="px-3 py-2.5 flex items-center gap-2.5">
-          {/* Avatar */}
-          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--purple)] flex items-center justify-center text-[10px] font-semibold text-white shrink-0">
-            {initials}
-          </div>
-
-          {/* Name + plan badge */}
-          <div className="flex-1 min-w-0">
-            <div className="text-[12px] font-medium text-[var(--text)] truncate leading-tight">
-              {displayName}
-            </div>
-            <div className="mt-[2px]">
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  fontFamily: "'Geist Mono', monospace",
-                  fontSize: '9px',
-                  fontWeight: 500,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                  padding: '1px 5px',
-                  borderRadius: '3px',
-                  color: planStyle.color,
-                  backgroundColor: planStyle.background,
-                  border: `1px solid ${planStyle.border}`,
-                }}
-              >
-                {PLAN_LABELS[user.plan] ?? user.plan}
-              </span>
-            </div>
-          </div>
-
-          {/* Sign out */}
-          <button
-            onClick={handleSignOut}
-            title="Sign out"
-            aria-label="Sign out"
-            className="w-6 h-6 flex items-center justify-center rounded-[4px] text-[var(--text-4)] hover:bg-[var(--bg-4)] hover:text-[var(--text-3)] transition-all duration-[100ms] shrink-0"
-          >
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M10 3h3a1 1 0 011 1v8a1 1 0 01-1 1h-3M6.5 5.5L10 8l-3.5 2.5M1 8h9" />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </>
+    </div>
   )
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-[220px] min-w-[220px] h-screen bg-[var(--bg-2)] border-r border-[var(--border)] flex-col overflow-hidden shrink-0 z-10">
+      {/* Desktop */}
+      <aside style={{
+        width: 224,
+        minWidth: 224,
+        height: '100vh',
+        background: 'var(--bg-2)',
+        borderRight: '1px solid var(--border)',
+        flexShrink: 0,
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        display: 'none',
+      }} className="md:!flex md:flex-col [&::-webkit-scrollbar]:hidden">
         {sidebarContent}
       </aside>
 
       {/* Mobile overlay */}
       {mobileSidebarOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-[2px] z-40"
+          className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-[2px] z-40"
           onClick={() => setMobileSidebarOpen(false)}
         />
       )}
 
-      {/* Mobile sidebar */}
+      {/* Mobile drawer */}
       <aside
         className={[
-          'md:hidden fixed top-0 left-0 bottom-0 w-[260px] bg-[var(--bg-2)] border-r border-[var(--border)] flex flex-col overflow-hidden z-50 transition-transform duration-300 ease-in-out',
+          'md:hidden fixed top-0 left-0 bottom-0 w-[260px] flex flex-col bg-[var(--bg-2)] border-r border-[var(--border)] overflow-y-auto z-50 transition-transform duration-300',
           mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full',
         ].join(' ')}
+        style={{ overflowX: 'hidden' }}
       >
         {sidebarContent}
       </aside>
