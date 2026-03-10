@@ -296,6 +296,18 @@ export default function LandingClient() {
   const isGenerating = phase === 'generating'
   const isDone = phase === 'done'
 
+  // ── Tema state ──
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  useEffect(() => {
+    const wrapper = document.querySelector('[data-theme]')
+    if (wrapper) {
+      wrapper.setAttribute('data-theme', theme)
+    } else {
+      // LandingClient kendi wrapper'ında data-theme yok, body'ye uygula
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+  }, [theme])
+
   return (
     <div style={{ minHeight:'100dvh',background:'var(--bg)',display:'flex',flexDirection:'column' }}>
 
@@ -333,6 +345,42 @@ export default function LandingClient() {
 
         {/* Auth buttons */}
         <div style={{ display:'flex',alignItems:'center',gap:'8px',flexShrink:0 }}>
+          {/* Tema Toggle */}
+          <button
+            onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+            aria-label={theme === 'dark' ? 'Açık temaya geç' : 'Koyu temaya geç'}
+            style={{
+              position: 'relative',
+              display: 'inline-flex',
+              alignItems: 'center',
+              width: '52px',
+              height: '26px',
+              borderRadius: '999px',
+              border: '1px solid var(--border-2)',
+              background: theme === 'dark' ? '#1a1a2e' : '#e8e6e0',
+              cursor: 'pointer',
+              padding: '3px',
+              transition: 'background 300ms ease, border-color 300ms ease',
+              flexShrink: 0,
+              outline: 'none',
+            }}
+          >
+            <span style={{ position:'absolute',left:'7px',fontSize:'10px',lineHeight:1,opacity:theme==='dark'?1:0,transition:'opacity 200ms ease',pointerEvents:'none' }}>🌙</span>
+            <span style={{ position:'absolute',right:'7px',fontSize:'10px',lineHeight:1,opacity:theme==='dark'?0:1,transition:'opacity 200ms ease',pointerEvents:'none' }}>☀️</span>
+            <span style={{
+              display: 'block',
+              width: '18px',
+              height: '18px',
+              borderRadius: '50%',
+              background: theme === 'dark' ? '#6366f1' : '#ffffff',
+              boxShadow: theme === 'dark' ? '0 0 6px rgba(99,102,241,0.6)' : '0 1px 4px rgba(0,0,0,0.18)',
+              transform: theme === 'dark' ? 'translateX(26px)' : 'translateX(0)',
+              transition: 'transform 300ms cubic-bezier(0.34,1.56,0.64,1), background 300ms ease, box-shadow 300ms ease',
+              flexShrink: 0,
+              position: 'relative',
+              zIndex: 1,
+            }} />
+          </button>
           <a
             href="/auth/login"
             style={{ fontFamily:"'Geist Mono',monospace",fontSize:'12px',color:'var(--text-2)',textDecoration:'none',padding:'7px 14px',border:'1px solid var(--border-2)',borderRadius:'8px',transition:'all 140ms ease',background:'transparent' }}
