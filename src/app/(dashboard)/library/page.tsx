@@ -772,7 +772,7 @@ export default function LibraryPage() {
 
   return (
     // -m-8 to escape layout padding, full height (layout uses py-8 px-8)
-    <div style={{ margin: '-32px -40px', height: 'calc(100vh - 52px)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div style={{ height: 'calc(100vh - 52px)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
       {/* Stats Row */}
       <div className="flex items-center gap-6 px-6 py-3 border-b border-[var(--border)] bg-[var(--bg)] flex-shrink-0">

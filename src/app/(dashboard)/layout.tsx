@@ -53,9 +53,7 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
         <Topbar user={user} />
 
         <main className="flex-1 overflow-y-auto overflow-x-hidden bg-[var(--bg)] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[var(--border-2)] [&::-webkit-scrollbar-thumb]:rounded-full">
-          <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 40px' }}>
-            {children}
-          </div>
+          {children}
         </main>
       </div>
 

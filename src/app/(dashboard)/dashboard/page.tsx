@@ -109,7 +109,7 @@ const STEPS = [
 /* ── Onboarding (first visit) ─────────────────────────────────────────────── */
 function OnboardingView({ name, timeLabel }: { name: string | null; timeLabel: string }) {
   return (
-    <div style={{ animation: 'fadeUp 0.45s ease' }}>
+    <div style={{ maxWidth: 860, margin: '0 auto', padding: '40px 40px', animation: 'fadeUp 0.45s ease' }}>
 
       {/* Hero */}
       <div style={{ marginBottom: 48 }}>
@@ -195,7 +195,7 @@ function WorkspaceView({
     : null
 
   return (
-    <div style={{ animation: 'fadeUp 0.35s ease' }}>
+    <div style={{ maxWidth: 860, margin: '0 auto', padding: '40px 40px', animation: 'fadeUp 0.35s ease' }}>
 
       {/* Header */}
       <div style={{ marginBottom: 32 }}>

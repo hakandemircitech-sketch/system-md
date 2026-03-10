@@ -385,7 +385,7 @@ export default function GeneratePage() {
     /* Full-bleed IDE layout — layout padding'ini iptal et */
     <div
       className="flex flex-col overflow-hidden"
-      style={{ margin: '-32px -40px', height: 'calc(100vh - 52px)' }}
+      style={{ height: 'calc(100vh - 52px)' }}
     >
       {/* Page Header */}
       <div style={{

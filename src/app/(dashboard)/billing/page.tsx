@@ -439,7 +439,7 @@ export default function BillingPage() {
   }
 
   return (
-    <>
+    <div style={{ maxWidth: 860, margin: '0 auto', padding: '40px 40px' }}>
       <style>{`
         @keyframes shimmer-banner {
           0%   { background-position: 0% 0% }
@@ -551,6 +551,6 @@ export default function BillingPage() {
           />
         )}
       </AnimatePresence>
-    </>
+    </div>
   )
 }
