@@ -249,22 +249,23 @@ export default function LandingClient() {
             {[...Array(2)].map((_, duplication) => (
               <span key={duplication} style={{ display: 'inline-flex', alignItems: 'center', gap: 0 }}>
                 {[
-                  { icon: '⚡', text: 'Kayıt yok' },
-                  { icon: '🆓', text: 'Tamamen ücretsiz' },
-                  { icon: '📦', text: 'ZIP olarak indir' },
-                  { icon: '🚀', text: 'Saniyeler içinde blueprint' },
-                  { icon: '🔓', text: 'Kredi kartı gerekmez' },
-                  { icon: '🛠️', text: 'Gerçek kod mimarisi' },
-                  { icon: '✨', text: 'AI ile üretildi' },
-                  { icon: '💡', text: 'Fikrini yaz, planı al' },
+                  { icon: '⚡', text: 'No sign-up required', accent: true },
+                  { icon: '🆓', text: 'Completely free', accent: false },
+                  { icon: '📦', text: 'Download as ZIP', accent: false },
+                  { icon: '🚀', text: 'Blueprint in seconds', accent: true },
+                  { icon: '🔓', text: 'No credit card', accent: false },
+                  { icon: '🛠️', text: 'Real code architecture', accent: false },
+                  { icon: '✨', text: 'Powered by AI', accent: true },
+                  { icon: '💡', text: 'Idea in · blueprint out', accent: false },
                 ].map((item, i) => (
                   <span key={i} style={{ display: 'inline-flex', alignItems: 'center' }}>
                     <span style={{
                       fontFamily: "'Geist Mono', monospace",
                       fontSize: '11px',
-                      color: 'var(--text-3)',
-                      letterSpacing: '0.03em',
+                      color: item.accent ? 'var(--accent)' : 'var(--text-2)',
+                      letterSpacing: '0.04em',
                       padding: '0 20px',
+                      fontWeight: item.accent ? 600 : 400,
                     }}>
                       <span style={{ marginRight: '7px' }}>{item.icon}</span>
                       {item.text}
