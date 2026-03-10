@@ -113,13 +113,16 @@ function OnboardingView({ name, timeLabel }: { name: string | null; timeLabel: s
 
       {/* Hero */}
       <div style={{ marginBottom: 48 }}>
-        <p style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--text-4)', marginBottom: 14 }}>
+        <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 12 }}>
           {timeLabel}
         </p>
-        <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 48, fontWeight: 400, lineHeight: 1.05, letterSpacing: '-0.025em', color: 'var(--text)', marginBottom: 16 }}>
-          {name ? <>Welcome back,{' '}<em style={{ fontStyle: 'italic', color: 'var(--accent)' }}>{name}.</em></> : <>Your workspace<br />is ready.</>}
+        <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 400, lineHeight: 1.15, letterSpacing: '-0.02em', color: 'var(--text)', marginBottom: 14 }}>
+          {name
+            ? <>Welcome back,<br /><span style={{ color: 'var(--accent)' }}>{name}.</span></>
+            : <>Your workspace<br /><span style={{ color: 'var(--accent)' }}>is ready.</span></>
+          }
         </h1>
-        <p style={{ fontSize: 15, color: 'var(--text-2)', lineHeight: 1.75, maxWidth: 480 }}>
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: 15, color: 'var(--text-3)', lineHeight: 1.65, maxWidth: 480 }}>
           Describe a startup idea — AI builds architecture, DB schema, and a Cursor build kit in under 60 seconds.
         </p>
       </div>
@@ -196,12 +199,12 @@ function WorkspaceView({
 
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
-        <p style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--text-4)', marginBottom: 12 }}>
+        <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 12 }}>
           {timeLabel}
         </p>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 40, fontWeight: 400, lineHeight: 1.05, letterSpacing: '-0.025em', color: 'var(--text)' }}>
-            {name ? <>{name}&apos;s workspace</> : <>Your workspace</>}
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 400, lineHeight: 1.15, letterSpacing: '-0.02em', color: 'var(--text)' }}>
+            {name ? <><span style={{ color: 'var(--accent)' }}>{name}</span>&apos;s workspace</> : <>Your workspace</>}
           </h1>
           <Link href="/generate" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 20px', background: 'var(--accent)', color: 'white', fontSize: 13, fontWeight: 600, borderRadius: 10, textDecoration: 'none', boxShadow: '0 2px 12px rgba(99,102,241,0.22)', transition: 'all 130ms ease', flexShrink: 0 }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--accent-hover)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)' }}
