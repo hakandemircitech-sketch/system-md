@@ -212,7 +212,13 @@ export async function POST(req: NextRequest) {
         const claudeStream = getAnthropic().messages.stream({
           model: modelId,
           max_tokens: 8192,
-          system: BLUEPRINT_SYSTEM_PROMPT,
+          system: [
+            {
+              type: 'text',
+              text: BLUEPRINT_SYSTEM_PROMPT,
+              cache_control: { type: 'ephemeral' },
+            },
+          ],
           messages: [{ role: 'user', content: userPrompt }],
         })
 

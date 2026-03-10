@@ -14,8 +14,8 @@ export function getAnthropic(): Anthropic {
 }
 
 export const AI_MODELS = {
-  standard: 'claude-sonnet-4-6',
-  power: 'claude-opus-4-6',
+  standard: 'claude-haiku-4-5',
+  power: 'claude-sonnet-4-6',
 } as const
 
 export type AiModel = keyof typeof AI_MODELS
