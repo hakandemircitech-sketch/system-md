@@ -231,29 +231,51 @@ export default function LandingClient() {
           <span style={{ color:'var(--accent)',animation:'blink 1.1s step-end infinite' }}>_</span>
         </span>
 
-        {/* Nav links */}
-        <nav style={{ display:'flex',alignItems:'center',gap:'28px' }}>
-          {[
-            { label:'Features', href:'#features' },
-            { label:'How it works', href:'#how-it-works' },
-            { label:'Pricing', href:'#pricing' },
-            { label:'About', href:'#about' },
-          ].map(link => (
-            <a
-              key={link.label}
-              href={link.href}
-              onClick={(e) => {
-                e.preventDefault()
-                document.getElementById(link.href.slice(1))?.scrollIntoView({ behavior:'smooth' })
-              }}
-              style={{ fontFamily:"'Geist',system-ui,sans-serif",fontSize:'13px',color:'var(--text-3)',textDecoration:'none',transition:'color 100ms ease',cursor:'pointer' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text)')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-3)')}
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
+        {/* Kayan ticker */}
+        <div style={{
+          flex: 1,
+          overflow: 'hidden',
+          margin: '0 32px',
+          maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+        }}>
+          <div style={{
+            display: 'flex',
+            gap: '0',
+            animation: 'ticker 28s linear infinite',
+            whiteSpace: 'nowrap',
+            width: 'max-content',
+          }}>
+            {[...Array(2)].map((_, duplication) => (
+              <span key={duplication} style={{ display: 'inline-flex', alignItems: 'center', gap: 0 }}>
+                {[
+                  { icon: '⚡', text: 'Kayıt yok' },
+                  { icon: '🆓', text: 'Tamamen ücretsiz' },
+                  { icon: '📦', text: 'ZIP olarak indir' },
+                  { icon: '🚀', text: 'Saniyeler içinde blueprint' },
+                  { icon: '🔓', text: 'Kredi kartı gerekmez' },
+                  { icon: '🛠️', text: 'Gerçek kod mimarisi' },
+                  { icon: '✨', text: 'AI ile üretildi' },
+                  { icon: '💡', text: 'Fikrini yaz, planı al' },
+                ].map((item, i) => (
+                  <span key={i} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                    <span style={{
+                      fontFamily: "'Geist Mono', monospace",
+                      fontSize: '11px',
+                      color: 'var(--text-3)',
+                      letterSpacing: '0.03em',
+                      padding: '0 20px',
+                    }}>
+                      <span style={{ marginRight: '7px' }}>{item.icon}</span>
+                      {item.text}
+                    </span>
+                    <span style={{ color: 'var(--border-2)', fontSize: '10px', userSelect: 'none' }}>·</span>
+                  </span>
+                ))}
+              </span>
+            ))}
+          </div>
+        </div>
 
         {/* Auth buttons */}
         <div style={{ display:'flex',alignItems:'center',gap:'8px',flexShrink:0 }}>
@@ -767,6 +789,7 @@ export default function LandingClient() {
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         @keyframes pulseDot { 0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.4); } 50% { box-shadow: 0 0 0 5px transparent; } }
+        @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
       `}</style>
     </div>
   )
