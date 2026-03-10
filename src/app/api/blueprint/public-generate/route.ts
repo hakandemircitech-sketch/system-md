@@ -167,14 +167,14 @@ export async function POST(req: NextRequest) {
       try {
         const supabase = await createClient()
 
-        // IP bazlı günlük limit kontrolü
+        // IP bazlı günlük limit kontrolü (email kolonu ip: prefix ile kullanılıyor)
         const todayStart = new Date()
         todayStart.setHours(0, 0, 0, 0)
 
         const { count } = await (supabase as any)
           .from('public_blueprints')
           .select('id', { count: 'exact', head: true })
-          .eq('ip_address', ip)
+          .eq('email', `ip:${ip}`)
           .gte('created_at', todayStart.toISOString())
 
         if ((count ?? 0) >= DAILY_LIMIT) {
@@ -185,11 +185,17 @@ export async function POST(req: NextRequest) {
 
         const { data: record, error: insertError } = await (supabase as any)
           .from('public_blueprints')
-          .insert({ ip_address: ip, idea_text, status: 'generating' })
+          .insert({
+            email: `ip:${ip}`,
+            ip_address: ip,
+            idea_text,
+            status: 'generating',
+          })
           .select('id')
           .single()
 
         if (insertError || !record) {
+          console.error('[public-generate] insert error:', insertError?.message, insertError?.code)
           send({ type: 'error', message: 'Failed to create blueprint record.' })
           controller.close()
           return
