@@ -224,20 +224,21 @@ export default function LandingClient() {
     <div style={{ minHeight:'100dvh',background:'var(--bg)',display:'flex',flexDirection:'column' }}>
 
       {/* ── SECTION 1: HEADER ── */}
-      <header style={{ padding:'14px 32px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0,position:'sticky',top:0,zIndex:40,backgroundColor:'var(--bg)',backdropFilter:'blur(8px)' }}>
+      <header style={{ padding:'12px 16px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0,position:'sticky',top:0,zIndex:40,backgroundColor:'var(--bg)',backdropFilter:'blur(8px)',gap:'12px' }}>
         {/* Logo */}
         <span style={{ fontFamily:"'Geist Mono',monospace",fontSize:'13px',fontWeight:500,letterSpacing:'-0.02em',color:'var(--text)',flexShrink:0 }}>
           System<span style={{ color:'var(--accent)' }}>MD</span>
           <span style={{ color:'var(--accent)',animation:'blink 1.1s step-end infinite' }}>_</span>
         </span>
 
-        {/* Kayan ticker */}
+        {/* Kayan ticker — sadece sm+ ekranlarda göster */}
         <div style={{
           flex: 1,
           overflow: 'hidden',
-          margin: '0 32px',
-          maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
-          WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+          margin: '0 8px',
+          maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
+          minWidth: 0,
         }}>
           <div style={{
             display: 'flex',
@@ -288,7 +289,7 @@ export default function LandingClient() {
                       fontSize: '11px',
                       color: item.accent ? 'var(--accent)' : 'var(--text-2)',
                       letterSpacing: '0.04em',
-                      padding: '0 20px',
+                      padding: '0 16px',
                       fontWeight: item.accent ? 600 : 400,
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -304,197 +305,207 @@ export default function LandingClient() {
           </div>
         </div>
 
-        {/* Auth buttons */}
-        <div style={{ display:'flex',alignItems:'center',gap:'8px',flexShrink:0 }}>
-          {/* Tema Toggle */}
-          <button
-            onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
-            aria-label={theme === 'dark' ? 'Açık temaya geç' : 'Koyu temaya geç'}
-            style={{
-              position: 'relative',
-              display: 'inline-flex',
-              alignItems: 'center',
-              width: '52px',
-              height: '26px',
-              borderRadius: '999px',
-              border: '1px solid var(--border-2)',
-              background: theme === 'dark' ? '#1a1a2e' : '#e8e6e0',
-              cursor: 'pointer',
-              padding: '3px',
-              transition: 'background 300ms ease, border-color 300ms ease',
-              flexShrink: 0,
-              outline: 'none',
-            }}
-          >
-            <span style={{ position:'absolute',left:'7px',fontSize:'10px',lineHeight:1,opacity:theme==='dark'?1:0,transition:'opacity 200ms ease',pointerEvents:'none' }}>🌙</span>
-            <span style={{ position:'absolute',right:'7px',fontSize:'10px',lineHeight:1,opacity:theme==='dark'?0:1,transition:'opacity 200ms ease',pointerEvents:'none' }}>☀️</span>
-            <span style={{
-              display: 'block',
-              width: '18px',
-              height: '18px',
-              borderRadius: '50%',
-              background: theme === 'dark' ? '#6366f1' : '#ffffff',
-              boxShadow: theme === 'dark' ? '0 0 6px rgba(99,102,241,0.6)' : '0 1px 4px rgba(0,0,0,0.18)',
-              transform: theme === 'dark' ? 'translateX(26px)' : 'translateX(0)',
-              transition: 'transform 300ms cubic-bezier(0.34,1.56,0.64,1), background 300ms ease, box-shadow 300ms ease',
-              flexShrink: 0,
-              position: 'relative',
-              zIndex: 1,
-            }} />
-          </button>
-        </div>
+        {/* Tema Toggle */}
+        <button
+          onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+          aria-label={theme === 'dark' ? 'Açık temaya geç' : 'Koyu temaya geç'}
+          style={{
+            position: 'relative',
+            display: 'inline-flex',
+            alignItems: 'center',
+            width: '48px',
+            height: '24px',
+            borderRadius: '999px',
+            border: '1px solid var(--border-2)',
+            background: theme === 'dark' ? '#1a1a2e' : '#e8e6e0',
+            cursor: 'pointer',
+            padding: '3px',
+            transition: 'background 300ms ease, border-color 300ms ease',
+            flexShrink: 0,
+            outline: 'none',
+          }}
+        >
+          <span style={{ position:'absolute',left:'6px',fontSize:'9px',lineHeight:1,opacity:theme==='dark'?1:0,transition:'opacity 200ms ease',pointerEvents:'none' }}>🌙</span>
+          <span style={{ position:'absolute',right:'6px',fontSize:'9px',lineHeight:1,opacity:theme==='dark'?0:1,transition:'opacity 200ms ease',pointerEvents:'none' }}>☀️</span>
+          <span style={{
+            display: 'block',
+            width: '16px',
+            height: '16px',
+            borderRadius: '50%',
+            background: theme === 'dark' ? '#6366f1' : '#ffffff',
+            boxShadow: theme === 'dark' ? '0 0 6px rgba(99,102,241,0.6)' : '0 1px 4px rgba(0,0,0,0.18)',
+            transform: theme === 'dark' ? 'translateX(24px)' : 'translateX(0)',
+            transition: 'transform 300ms cubic-bezier(0.34,1.56,0.64,1), background 300ms ease, box-shadow 300ms ease',
+            flexShrink: 0,
+            position: 'relative',
+            zIndex: 1,
+          }} />
+        </button>
       </header>
 
       {/* ── SECTION 2: HERO ── */}
-      <div style={{ textAlign:'center',padding:'48px 24px 32px',flexShrink:0 }}>
+      <div style={{ textAlign:'center',padding:'36px 20px 24px',flexShrink:0 }}>
         <p style={{ fontFamily:"'Geist Mono',monospace",fontSize:'11px',color:'var(--accent)',textTransform:'uppercase',letterSpacing:'0.12em',marginBottom:'12px' }}>
           ship faster · build smarter
         </p>
-        <h1 style={{ fontFamily:"'Instrument Serif',Georgia,serif",fontSize:'clamp(28px, 5vw, 52px)',fontWeight:400,color:'var(--text)',letterSpacing:'-0.02em',lineHeight:1.15,marginBottom:'14px' }}>
+        <h1 style={{ fontFamily:"'Instrument Serif',Georgia,serif",fontSize:'clamp(26px, 6vw, 52px)',fontWeight:400,color:'var(--text)',letterSpacing:'-0.02em',lineHeight:1.15,marginBottom:'14px' }}>
           Turn your idea into a<br />
           <span style={{ color:'var(--accent)' }}>production blueprint.</span>
         </h1>
-        <p style={{ fontFamily:"'Geist',system-ui,sans-serif",fontSize:'15px',color:'var(--text-3)',maxWidth:'480px',margin:'0 auto',lineHeight:1.65 }}>
+        <p style={{ fontFamily:"'Geist',system-ui,sans-serif",fontSize:'15px',color:'var(--text-3)',maxWidth:'480px',margin:'0 auto',lineHeight:1.65,padding:'0 8px' }}>
           Describe what you&apos;re building. Get architecture, schema, API design, revenue model — as a ZIP.
         </p>
       </div>
 
       {/* ── SECTION 3: SPLIT PANEL ── */}
-      <div id="how-it-works" style={{ flex:'none',display:'flex',maxWidth:'960px',width:'100%',margin:'0 auto',padding:'0 24px',gap:'16px',boxSizing:'border-box',minHeight:'440px' }}>
+      <div id="how-it-works" style={{ flex:'none',display:'flex',flexDirection:'column',maxWidth:'960px',width:'100%',margin:'0 auto',padding:'0 16px',gap:'12px',boxSizing:'border-box' }}>
+        <style>{`
+          @media (min-width: 640px) {
+            .split-panel { flex-direction: row !important; min-height: 440px; }
+            .split-left { flex: 0 0 380px !important; width: auto !important; }
+            .split-right { flex: 1 !important; min-height: 0 !important; }
+          }
+        `}</style>
 
-        {/* Left: input */}
-        <div style={{ flex:'0 0 400px',background:'var(--bg-2)',border:'1px solid var(--border)',borderRadius:'12px',display:'flex',flexDirection:'column',overflow:'hidden' }}>
-          <div style={{ padding:'14px 20px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',gap:'7px' }}>
-            <div style={{ width:5,height:5,borderRadius:'50%',background:'var(--accent)' }} />
-            <span style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',fontWeight:500,textTransform:'uppercase',letterSpacing:'0.1em',color:'var(--text-3)' }}>
-              your idea
-            </span>
-          </div>
-
-          <div style={{ flex:1,padding:'20px',display:'flex',flexDirection:'column' }}>
-            <textarea
-              value={idea}
-              onChange={(e) => setIdea(e.target.value.slice(0, MAX))}
-              placeholder="A tool that helps indie hackers track their MRR across multiple products..."
-              disabled={isGenerating || isDone}
-              rows={8}
-              style={{ flex:1,width:'100%',background:'transparent',border:'none',outline:'none',resize:'none',fontSize:'14px',fontFamily:"'Geist',system-ui,sans-serif",color:'var(--text)',lineHeight:1.7,opacity:isGenerating||isDone?0.5:1,boxSizing:'border-box' }}
-            />
-            <div style={{ display:'flex',justifyContent:'flex-end',paddingTop:'8px' }}>
-              <span style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:idea.length > MAX * 0.9 ? 'var(--yellow)' : 'var(--text-4)' }}>
-                {idea.length} / {MAX}
+        <div className="split-panel" style={{ display:'flex',flexDirection:'column',gap:'12px' }}>
+          {/* Left: input */}
+          <div className="split-left" style={{ width:'100%',background:'var(--bg-2)',border:'1px solid var(--border)',borderRadius:'12px',display:'flex',flexDirection:'column',overflow:'hidden' }}>
+            <div style={{ padding:'14px 20px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',gap:'7px' }}>
+              <div style={{ width:5,height:5,borderRadius:'50%',background:'var(--accent)' }} />
+              <span style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',fontWeight:500,textTransform:'uppercase',letterSpacing:'0.1em',color:'var(--text-3)' }}>
+                your idea
               </span>
             </div>
-          </div>
 
-          <div style={{ padding:'16px 20px',borderTop:'1px solid var(--border)' }}>
-            {isDone ? (
-              <div style={{ display:'flex',flexDirection:'column',gap:'8px' }}>
-                  {downloadUrl ? (
-                    <a
-                      href={downloadUrl}
-                      download="blueprint.zip"
-                      style={{ display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',padding:'12px 14px',background:'var(--accent)',color:'white',borderRadius:'8px',textDecoration:'none',fontFamily:"'Geist Mono',monospace",fontSize:'12px',fontWeight:500 }}
+            <div style={{ flex:1,padding:'20px',display:'flex',flexDirection:'column' }}>
+              <textarea
+                value={idea}
+                onChange={(e) => setIdea(e.target.value.slice(0, MAX))}
+                placeholder="A tool that helps indie hackers track their MRR across multiple products..."
+                disabled={isGenerating || isDone}
+                rows={6}
+                style={{ flex:1,width:'100%',background:'transparent',border:'none',outline:'none',resize:'none',fontSize:'14px',fontFamily:"'Geist',system-ui,sans-serif",color:'var(--text)',lineHeight:1.7,opacity:isGenerating||isDone?0.5:1,boxSizing:'border-box' }}
+              />
+              <div style={{ display:'flex',justifyContent:'flex-end',paddingTop:'8px' }}>
+                <span style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:idea.length > MAX * 0.9 ? 'var(--yellow)' : 'var(--text-4)' }}>
+                  {idea.length} / {MAX}
+                </span>
+              </div>
+            </div>
+
+            <div style={{ padding:'16px 20px',borderTop:'1px solid var(--border)' }}>
+              {isDone ? (
+                <div style={{ display:'flex',flexDirection:'column',gap:'8px' }}>
+                    {downloadUrl ? (
+                      <a
+                        href={downloadUrl}
+                        download="blueprint.zip"
+                        style={{ display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',padding:'12px 14px',background:'var(--accent)',color:'white',borderRadius:'8px',textDecoration:'none',fontFamily:"'Geist Mono',monospace",fontSize:'12px',fontWeight:500 }}
+                      >
+                        download blueprint.zip
+                      </a>
+                    ) : (
+                      <div style={{ display:'flex',alignItems:'center',gap:'8px',padding:'10px 14px',background:'rgba(34,197,94,0.06)',border:'1px solid rgba(34,197,94,0.2)',borderRadius:'8px' }}>
+                        <span style={{ color:'var(--green)',fontSize:'14px' }}>✓</span>
+                        <span style={{ fontFamily:"'Geist Mono',monospace",fontSize:'11px',color:'var(--green)' }}>Blueprint ready</span>
+                      </div>
+                    )}
+                    <button
+                      onClick={handleReset}
+                      style={{ width:'100%',padding:'10px',background:'transparent',border:'1px solid var(--border-2)',borderRadius:'8px',fontSize:'12px',fontFamily:"'Geist Mono',monospace",color:'var(--text-3)',cursor:'pointer' }}
                     >
-                      download blueprint.zip
-                    </a>
-                  ) : (
-                    <div style={{ display:'flex',alignItems:'center',gap:'8px',padding:'10px 14px',background:'rgba(34,197,94,0.06)',border:'1px solid rgba(34,197,94,0.2)',borderRadius:'8px' }}>
-                      <span style={{ color:'var(--green)',fontSize:'14px' }}>✓</span>
-                      <span style={{ fontFamily:"'Geist Mono',monospace",fontSize:'11px',color:'var(--green)' }}>Blueprint ready</span>
-                    </div>
-                  )}
+                      new idea -&gt;
+                    </button>
+                  </div>
+              ) : (
+                <>
                   <button
-                    onClick={handleReset}
-                    style={{ width:'100%',padding:'10px',background:'transparent',border:'1px solid var(--border-2)',borderRadius:'8px',fontSize:'12px',fontFamily:"'Geist Mono',monospace",color:'var(--text-3)',cursor:'pointer' }}
+                    onClick={handleAnalyze}
+                    disabled={isGenerating || idea.trim().length < 10}
+                    style={{ width:'100%',padding:'13px',background:isGenerating||idea.trim().length<10?'var(--bg-4)':'var(--text)',color:isGenerating||idea.trim().length<10?'var(--text-4)':'var(--bg)',border:'none',borderRadius:'8px',fontSize:'13px',fontFamily:"'Geist Mono',monospace",fontWeight:500,cursor:isGenerating||idea.trim().length<10?'not-allowed':'pointer',transition:'all 140ms ease',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px' }}
                   >
-                    new idea -&gt;
+                    {isGenerating
+                      ? (<><span style={{ width:12,height:12,border:'1.5px solid var(--text-4)',borderTopColor:'var(--text-2)',borderRadius:'50%',animation:'spin 0.7s linear infinite',display:'inline-block' }} />generating...</>)
+                      : 'analyze →'
+                    }
                   </button>
-                </div>
-            ) : (
-              <>
-                <button
-                  onClick={handleAnalyze}
-                  disabled={isGenerating || idea.trim().length < 10}
-                  style={{ width:'100%',padding:'13px',background:isGenerating||idea.trim().length<10?'var(--bg-4)':'var(--text)',color:isGenerating||idea.trim().length<10?'var(--text-4)':'var(--bg)',border:'none',borderRadius:'8px',fontSize:'13px',fontFamily:"'Geist Mono',monospace",fontWeight:500,cursor:isGenerating||idea.trim().length<10?'not-allowed':'pointer',transition:'all 140ms ease',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px' }}
-                >
-                  {isGenerating
-                    ? (<><span style={{ width:12,height:12,border:'1.5px solid var(--text-4)',borderTopColor:'var(--text-2)',borderRadius:'50%',animation:'spin 0.7s linear infinite',display:'inline-block' }} />generating...</>)
-                    : 'analyze →'
-                  }
-                </button>
-                <p style={{ textAlign:'center',marginTop:'8px',fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:'var(--text-4)' }}>
-                  free to try · no credit card
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Right: terminal */}
-        <div style={{ flex:1,background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'12px',display:'flex',flexDirection:'column',overflow:'hidden',minWidth:0 }}>
-          <div style={{ padding:'12px 20px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0,background:'var(--bg-2)' }}>
-            <div style={{ display:'flex',alignItems:'center',gap:'6px' }}>
-              <div style={{ width:10,height:10,borderRadius:'50%',background:'#FF5F57' }} />
-              <div style={{ width:10,height:10,borderRadius:'50%',background:'#FFBD2E' }} />
-              <div style={{ width:10,height:10,borderRadius:'50%',background:'#28CA41' }} />
+                  <p style={{ textAlign:'center',marginTop:'8px',fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:'var(--text-4)' }}>
+                    free to try · no credit card
+                  </p>
+                </>
+              )}
             </div>
-            <span style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:'var(--text-4)',letterSpacing:'0.05em' }}>
-              blueprint output
-            </span>
           </div>
 
-          {(isGenerating || isDone) && (
-            <div style={{ height:'1px',background:'var(--border)',flexShrink:0 }}>
-              <div style={{ height:'100%',background:'linear-gradient(to right, var(--accent), var(--green))',width:`${progress}%`,transition:'width 500ms ease' }} />
-            </div>
-          )}
-
-          <div style={{ flex:1,overflowY:'auto',padding:'20px 24px',fontFamily:"'Geist Mono',monospace",fontSize:'12px',lineHeight:2 }}>
-            {termLines.length === 0 ? (
-              <div>
-                <span style={{ color:'var(--text-4)' }}>$ </span>
-                <span style={{ color:'var(--text-3)' }}>waiting for input</span>
+          {/* Right: terminal */}
+          <div className="split-right" style={{ minHeight:'260px',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'12px',display:'flex',flexDirection:'column',overflow:'hidden' }}>
+            <div style={{ padding:'12px 20px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0,background:'var(--bg-2)' }}>
+              <div style={{ display:'flex',alignItems:'center',gap:'6px' }}>
+                <div style={{ width:10,height:10,borderRadius:'50%',background:'#FF5F57' }} />
+                <div style={{ width:10,height:10,borderRadius:'50%',background:'#FFBD2E' }} />
+                <div style={{ width:10,height:10,borderRadius:'50%',background:'#28CA41' }} />
               </div>
-            ) : (
-              termLines.map((line, i) => (
-                <div
-                  key={i}
-                  style={{ color:line.type==='success'?'var(--green)':line.type==='error'?'var(--red)':line.type==='info'?'var(--accent)':line.type==='dim'?'var(--text-4)':'var(--text-3)',whiteSpace:'pre-wrap',wordBreak:'break-word' }}
-                >
-                  {line.text || '\u00A0'}
-                </div>
-              ))
-            )}
-            {isGenerating && (
-              <div style={{ display:'flex',alignItems:'center',gap:2,marginTop:4 }}>
-                <span style={{ color:'var(--text-4)' }}>$ </span>
-                <span style={{ display:'inline-block',width:6,height:13,background:'var(--text-3)',marginLeft:2,animation:'blink 1.1s step-end infinite' }} />
-              </div>
-            )}
-            <div ref={bottomRef} />
-          </div>
-
-          <div style={{ padding:'10px 20px',borderTop:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0,background:'var(--bg-2)' }}>
-            <div style={{ display:'flex',alignItems:'center',gap:'6px' }}>
-              <div style={{ width:6,height:6,borderRadius:'50%',background:isGenerating?'var(--yellow)':isDone?'var(--green)':'var(--text-4)',animation:isGenerating?'pulseDot 2s ease infinite':undefined }} />
-              <span style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:'var(--text-3)' }}>
-                {isGenerating ? 'claude api connected' : isDone ? 'complete' : 'idle'}
+              <span style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:'var(--text-4)',letterSpacing:'0.05em' }}>
+                blueprint output
               </span>
             </div>
-            <span style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:'var(--text-4)' }}>
-              {termLines.filter(l => l.text).length} lines
-            </span>
+
+            {(isGenerating || isDone) && (
+              <div style={{ height:'1px',background:'var(--border)',flexShrink:0 }}>
+                <div style={{ height:'100%',background:'linear-gradient(to right, var(--accent), var(--green))',width:`${progress}%`,transition:'width 500ms ease' }} />
+              </div>
+            )}
+
+            <div style={{ flex:1,overflowY:'auto',padding:'20px 24px',fontFamily:"'Geist Mono',monospace",fontSize:'12px',lineHeight:2 }}>
+              {termLines.length === 0 ? (
+                <div>
+                  <span style={{ color:'var(--text-4)' }}>$ </span>
+                  <span style={{ color:'var(--text-3)' }}>waiting for input</span>
+                </div>
+              ) : (
+                termLines.map((line, i) => (
+                  <div
+                    key={i}
+                    style={{ color:line.type==='success'?'var(--green)':line.type==='error'?'var(--red)':line.type==='info'?'var(--accent)':line.type==='dim'?'var(--text-4)':'var(--text-3)',whiteSpace:'pre-wrap',wordBreak:'break-word' }}
+                  >
+                    {line.text || '\u00A0'}
+                  </div>
+                ))
+              )}
+              {isGenerating && (
+                <div style={{ display:'flex',alignItems:'center',gap:2,marginTop:4 }}>
+                  <span style={{ color:'var(--text-4)' }}>$ </span>
+                  <span style={{ display:'inline-block',width:6,height:13,background:'var(--text-3)',marginLeft:2,animation:'blink 1.1s step-end infinite' }} />
+                </div>
+              )}
+              <div ref={bottomRef} />
+            </div>
+
+            <div style={{ padding:'10px 20px',borderTop:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0,background:'var(--bg-2)' }}>
+              <div style={{ display:'flex',alignItems:'center',gap:'6px' }}>
+                <div style={{ width:6,height:6,borderRadius:'50%',background:isGenerating?'var(--yellow)':isDone?'var(--green)':'var(--text-4)',animation:isGenerating?'pulseDot 2s ease infinite':undefined }} />
+                <span style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:'var(--text-3)' }}>
+                  {isGenerating ? 'claude api connected' : isDone ? 'complete' : 'idle'}
+                </span>
+              </div>
+              <span style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:'var(--text-4)' }}>
+                {termLines.filter(l => l.text).length} lines
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* ── SECTION 4: WHAT YOU GET ── */}
-      <div id="features" style={{ maxWidth:'960px',width:'100%',margin:'64px auto 0',padding:'0 24px',boxSizing:'border-box' }}>
+      <div id="features" style={{ maxWidth:'960px',width:'100%',margin:'64px auto 0',padding:'0 16px',boxSizing:'border-box' }}>
         <p style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:'var(--text-4)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'24px' }}>
           what&apos;s inside every blueprint
         </p>
-        <div style={{ display:'grid',gridTemplateColumns:'repeat(4, 1fr)',gap:'12px' }}>
+        <style>{`
+          .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+          @media (min-width: 640px) { .features-grid { grid-template-columns: repeat(4, 1fr); } }
+        `}</style>
+        <div className="features-grid">
           {[
             {
               tag: '.cursorrules',
@@ -519,12 +530,12 @@ export default function LandingClient() {
           ].map((card) => (
             <div
               key={card.tag}
-              style={{ background:'var(--bg-2)',border:'1px solid var(--border)',borderRadius:'12px',padding:'24px',display:'flex',flexDirection:'column',gap:'10px' }}
+              style={{ background:'var(--bg-2)',border:'1px solid var(--border)',borderRadius:'12px',padding:'20px',display:'flex',flexDirection:'column',gap:'10px' }}
             >
               <span style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:'var(--accent)',textTransform:'uppercase',letterSpacing:'0.1em' }}>
                 {card.tag}
               </span>
-              <h3 style={{ fontFamily:"'Instrument Serif',Georgia,serif",fontSize:'18px',fontWeight:400,color:'var(--text)',lineHeight:1.25 }}>
+              <h3 style={{ fontFamily:"'Instrument Serif',Georgia,serif",fontSize:'17px',fontWeight:400,color:'var(--text)',lineHeight:1.25 }}>
                 {card.title}
               </h3>
               <p style={{ fontFamily:"'Geist',system-ui,sans-serif",fontSize:'13px',color:'var(--text-3)',lineHeight:1.65 }}>
@@ -536,106 +547,124 @@ export default function LandingClient() {
       </div>
 
       {/* ── SECTION 5: ORIGINAL KIT ── */}
-      <div style={{ maxWidth:'960px',width:'100%',margin:'80px auto 0',padding:'0 24px',boxSizing:'border-box',display:'flex',gap:'48px',alignItems:'center' }}>
-        {/* Left: text */}
-        <div style={{ flex:1 }}>
-          <p style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:'var(--text-4)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'16px' }}>
-            where it started
-          </p>
-          <h2 style={{ fontFamily:"'Instrument Serif',Georgia,serif",fontSize:'clamp(24px, 3vw, 36px)',fontWeight:400,color:'var(--text)',letterSpacing:'-0.02em',lineHeight:1.2,marginBottom:'16px' }}>
-            The original SystemMD kit.
-          </h2>
-          <p style={{ fontFamily:"'Geist',system-ui,sans-serif",fontSize:'14px',color:'var(--text-3)',lineHeight:1.7,marginBottom:'28px' }}>
-            Before the platform, there was a file. A hand-crafted blueprint that started this whole system. Download it and see what a production blueprint looks like.
-          </p>
-          <button
-            onClick={() => {
-              const a = document.createElement('a')
-              a.href = '/systemmd-original-kit.zip'
-              a.download = 'systemmd-original-kit.zip'
-              document.body.appendChild(a)
-              a.click()
-              document.body.removeChild(a)
-            }}
-            style={{ padding:'12px 20px',background:'var(--text)',color:'var(--bg)',border:'none',borderRadius:'8px',fontSize:'13px',fontFamily:"'Geist Mono',monospace",fontWeight:500,cursor:'pointer',transition:'all 140ms ease' }}
-          >
-            download original kit →
-          </button>
-        </div>
+      <style>{`
+        .kit-section { display: flex; flex-direction: column; gap: 32px; }
+        .kit-terminal { width: 100% !important; flex: none !important; }
+        @media (min-width: 640px) {
+          .kit-section { flex-direction: row; gap: 48px; align-items: center; }
+          .kit-terminal { flex: 0 0 320px !important; width: auto !important; }
+        }
+        .story-section { display: flex; flex-direction: column; gap: 40px; }
+        .story-timeline { flex: none !important; padding-top: 0 !important; }
+        @media (min-width: 640px) {
+          .story-section { flex-direction: row; gap: 64px; }
+          .story-timeline { flex: 0 0 280px !important; padding-top: 52px !important; }
+        }
+      `}</style>
+      <div style={{ maxWidth:'960px',width:'100%',margin:'80px auto 0',padding:'0 16px',boxSizing:'border-box' }}>
+        <div className="kit-section">
+          {/* Left: text */}
+          <div style={{ flex:1 }}>
+            <p style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:'var(--text-4)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'16px' }}>
+              where it started
+            </p>
+            <h2 style={{ fontFamily:"'Instrument Serif',Georgia,serif",fontSize:'clamp(24px, 3vw, 36px)',fontWeight:400,color:'var(--text)',letterSpacing:'-0.02em',lineHeight:1.2,marginBottom:'16px' }}>
+              The original SystemMD kit.
+            </h2>
+            <p style={{ fontFamily:"'Geist',system-ui,sans-serif",fontSize:'14px',color:'var(--text-3)',lineHeight:1.7,marginBottom:'28px' }}>
+              Before the platform, there was a file. A hand-crafted blueprint that started this whole system. Download it and see what a production blueprint looks like.
+            </p>
+            <button
+              onClick={() => {
+                const a = document.createElement('a')
+                a.href = '/systemmd-original-kit.zip'
+                a.download = 'systemmd-original-kit.zip'
+                document.body.appendChild(a)
+                a.click()
+                document.body.removeChild(a)
+              }}
+              style={{ padding:'12px 20px',background:'var(--text)',color:'var(--bg)',border:'none',borderRadius:'8px',fontSize:'13px',fontFamily:"'Geist Mono',monospace",fontWeight:500,cursor:'pointer',transition:'all 140ms ease' }}
+            >
+              download original kit →
+            </button>
+          </div>
 
-        {/* Right: terminal preview */}
-        <div style={{ flex:'0 0 320px',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'12px',padding:'24px',fontFamily:"'Geist Mono',monospace",fontSize:'11px',lineHeight:1.9 }}>
-          <div style={{ color:'var(--text-3)' }}>$ ls systemmd-kit/</div>
-          <div style={{ color:'var(--green)' }}>.cursorrules</div>
-          <div style={{ color:'var(--green)' }}>schema.sql</div>
-          <div style={{ color:'var(--green)' }}>BUILD.md</div>
-          <div style={{ color:'var(--green)' }}>.env.example</div>
-          <div style={{ color:'var(--green)' }}>quickstart.sh</div>
-          <div>&nbsp;</div>
-          <div style={{ color:'var(--text-3)' }}>$ wc -l BUILD.md</div>
-          <div style={{ color:'var(--accent)' }}>247 BUILD.md</div>
-          <div>&nbsp;</div>
-          <div style={{ color:'var(--text-3)' }}>$ echo $READY</div>
-          <div style={{ color:'var(--green)' }}>true</div>
+          {/* Right: terminal preview */}
+          <div className="kit-terminal" style={{ background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'12px',padding:'24px',fontFamily:"'Geist Mono',monospace",fontSize:'11px',lineHeight:1.9 }}>
+            <div style={{ color:'var(--text-3)' }}>$ ls systemmd-kit/</div>
+            <div style={{ color:'var(--green)' }}>.cursorrules</div>
+            <div style={{ color:'var(--green)' }}>schema.sql</div>
+            <div style={{ color:'var(--green)' }}>BUILD.md</div>
+            <div style={{ color:'var(--green)' }}>.env.example</div>
+            <div style={{ color:'var(--green)' }}>quickstart.sh</div>
+            <div>&nbsp;</div>
+            <div style={{ color:'var(--text-3)' }}>$ wc -l BUILD.md</div>
+            <div style={{ color:'var(--accent)' }}>247 BUILD.md</div>
+            <div>&nbsp;</div>
+            <div style={{ color:'var(--text-3)' }}>$ echo $READY</div>
+            <div style={{ color:'var(--green)' }}>true</div>
+          </div>
         </div>
       </div>
 
       {/* ── SECTION 6: STORY ── */}
-      <div id="about" style={{ maxWidth:'960px',width:'100%',margin:'80px auto 0',padding:'0 24px 80px',boxSizing:'border-box',display:'flex',gap:'64px' }}>
-        {/* Left: text */}
-        <div style={{ flex:1 }}>
-          <p style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:'var(--text-4)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'16px' }}>
-            the builder
-          </p>
-          <h2 style={{ fontFamily:"'Instrument Serif',Georgia,serif",fontSize:'clamp(24px, 3vw, 36px)',fontWeight:400,color:'var(--text)',letterSpacing:'-0.02em',lineHeight:1.2,marginBottom:'24px' }}>
-            Built by a founder solving his own problem
-          </h2>
-          <div style={{ display:'flex',flexDirection:'column',gap:'16px',marginBottom:'28px' }}>
-            <p style={{ fontFamily:"'Geist',system-ui,sans-serif",fontSize:'14px',color:'var(--text-3)',lineHeight:1.75 }}>
-              I built SystemMD because I needed a better way to turn complex product ideas into usable technical plans.
+      <div id="about" style={{ maxWidth:'960px',width:'100%',margin:'80px auto 0',padding:'0 16px 80px',boxSizing:'border-box' }}>
+        <div className="story-section">
+          {/* Left: text */}
+          <div style={{ flex:1 }}>
+            <p style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:'var(--text-4)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'16px' }}>
+              the builder
             </p>
-            <p style={{ fontFamily:"'Geist',system-ui,sans-serif",fontSize:'14px',color:'var(--text-3)',lineHeight:1.75 }}>
-              What started as a personal blueprint system is becoming the platform I wish I had when I first started building.
-            </p>
-            <p style={{ fontFamily:"'Geist',system-ui,sans-serif",fontSize:'14px',color:'var(--text-3)',lineHeight:1.75 }}>
-              It is being shaped through real workflows, practical output, and continuous refinement rather than presentation theater.
-            </p>
-          </div>
-          <button
-            onClick={() => window.open('https://github.com/hakandemircitech-sketch/system-md', '_blank')}
-            style={{ padding:'10px 18px',background:'transparent',color:'var(--text)',border:'1px solid var(--border-2)',borderRadius:'8px',fontSize:'13px',fontFamily:"'Geist Mono',monospace",cursor:'pointer',transition:'all 140ms ease' }}
-          >
-            view on github →
-          </button>
-        </div>
-
-        {/* Right: timeline */}
-        <div style={{ flex:'0 0 280px',display:'flex',flexDirection:'column',gap:0,paddingTop:'52px' }}>
-          {[
-            { label:'SystemMD', sub:'Blueprint generator. Live.', dotColor:'var(--green)', filled:true },
-            { label:'BUILT IN PUBLIC', sub:'Progress, product direction, and implementation are visible in the open.', dotColor:'var(--accent)', filled:true },
-            { label:'REAL WORKFLOWS', sub:'SystemMD is shaped by actual planning and build use cases, not landing page theater.', dotColor:'var(--accent)', filled:true },
-            { label:'CONTINUOUS REFINEMENT', sub:'The product improves through direct usage, feedback, and iteration.', dotColor:'var(--border)', filled:false },
-          ].map((item, i, arr) => (
-            <div key={item.label} style={{ display:'flex',gap:'16px' }}>
-              {/* dot + line */}
-              <div style={{ display:'flex',flexDirection:'column',alignItems:'center',flexShrink:0 }}>
-                <div style={{ width:10,height:10,borderRadius:'50%',background:item.filled ? item.dotColor : 'transparent',border:`2px solid ${item.dotColor}`,flexShrink:0,marginTop:'3px' }} />
-                {i < arr.length - 1 && (
-                  <div style={{ width:1,flex:1,background:'var(--border)',minHeight:'40px' }} />
-                )}
-              </div>
-              {/* text */}
-              <div style={{ paddingBottom: i < arr.length - 1 ? '28px' : 0 }}>
-                <div style={{ fontFamily:"'Geist Mono',monospace",fontSize:'12px',color:'var(--text)',fontWeight:500,marginBottom:'4px' }}>
-                  {item.label}
-                </div>
-                <div style={{ fontFamily:"'Geist',system-ui,sans-serif",fontSize:'12px',color:'var(--text-3)',lineHeight:1.5 }}>
-                  {item.sub}
-                </div>
-              </div>
+            <h2 style={{ fontFamily:"'Instrument Serif',Georgia,serif",fontSize:'clamp(24px, 3vw, 36px)',fontWeight:400,color:'var(--text)',letterSpacing:'-0.02em',lineHeight:1.2,marginBottom:'24px' }}>
+              Built by a founder solving his own problem
+            </h2>
+            <div style={{ display:'flex',flexDirection:'column',gap:'16px',marginBottom:'28px' }}>
+              <p style={{ fontFamily:"'Geist',system-ui,sans-serif",fontSize:'14px',color:'var(--text-3)',lineHeight:1.75 }}>
+                I built SystemMD because I needed a better way to turn complex product ideas into usable technical plans.
+              </p>
+              <p style={{ fontFamily:"'Geist',system-ui,sans-serif",fontSize:'14px',color:'var(--text-3)',lineHeight:1.75 }}>
+                What started as a personal blueprint system is becoming the platform I wish I had when I first started building.
+              </p>
+              <p style={{ fontFamily:"'Geist',system-ui,sans-serif",fontSize:'14px',color:'var(--text-3)',lineHeight:1.75 }}>
+                It is being shaped through real workflows, practical output, and continuous refinement rather than presentation theater.
+              </p>
             </div>
-          ))}
+            <button
+              onClick={() => window.open('https://github.com/hakandemircitech-sketch/system-md', '_blank')}
+              style={{ padding:'10px 18px',background:'transparent',color:'var(--text)',border:'1px solid var(--border-2)',borderRadius:'8px',fontSize:'13px',fontFamily:"'Geist Mono',monospace",cursor:'pointer',transition:'all 140ms ease' }}
+            >
+              view on github →
+            </button>
+          </div>
+
+          {/* Right: timeline */}
+          <div className="story-timeline" style={{ flex:'0 0 280px',display:'flex',flexDirection:'column',gap:0 }}>
+            {[
+              { label:'SystemMD', sub:'Blueprint generator. Live.', dotColor:'var(--green)', filled:true },
+              { label:'BUILT IN PUBLIC', sub:'Progress, product direction, and implementation are visible in the open.', dotColor:'var(--accent)', filled:true },
+              { label:'REAL WORKFLOWS', sub:'SystemMD is shaped by actual planning and build use cases, not landing page theater.', dotColor:'var(--accent)', filled:true },
+              { label:'CONTINUOUS REFINEMENT', sub:'The product improves through direct usage, feedback, and iteration.', dotColor:'var(--border)', filled:false },
+            ].map((item, i, arr) => (
+              <div key={item.label} style={{ display:'flex',gap:'16px' }}>
+                {/* dot + line */}
+                <div style={{ display:'flex',flexDirection:'column',alignItems:'center',flexShrink:0 }}>
+                  <div style={{ width:10,height:10,borderRadius:'50%',background:item.filled ? item.dotColor : 'transparent',border:`2px solid ${item.dotColor}`,flexShrink:0,marginTop:'3px' }} />
+                  {i < arr.length - 1 && (
+                    <div style={{ width:1,flex:1,background:'var(--border)',minHeight:'40px' }} />
+                  )}
+                </div>
+                {/* text */}
+                <div style={{ paddingBottom: i < arr.length - 1 ? '28px' : 0 }}>
+                  <div style={{ fontFamily:"'Geist Mono',monospace",fontSize:'12px',color:'var(--text)',fontWeight:500,marginBottom:'4px' }}>
+                    {item.label}
+                  </div>
+                  <div style={{ fontFamily:"'Geist',system-ui,sans-serif",fontSize:'12px',color:'var(--text-3)',lineHeight:1.5 }}>
+                    {item.sub}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -748,7 +777,7 @@ export default function LandingClient() {
 
       {/* ── SECTION 8: MESSAGE FORM ── */}
       <div style={{ borderTop:'1px solid var(--border)',paddingTop:'80px',paddingBottom:'120px' }}>
-        <div style={{ maxWidth:'600px',width:'100%',margin:'0 auto',padding:'0 24px',boxSizing:'border-box' }}>
+        <div style={{ maxWidth:'600px',width:'100%',margin:'0 auto',padding:'0 16px',boxSizing:'border-box' }}>
           <p style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:'var(--text-4)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'16px' }}>
             say something
           </p>
@@ -795,7 +824,7 @@ export default function LandingClient() {
       </div>
 
       {/* ── SECTION 9: FOOTER ── */}
-      <footer style={{ borderTop:'1px solid var(--border)',padding:'24px',display:'flex',alignItems:'center',justifyContent:'space-between' }}>
+      <footer style={{ borderTop:'1px solid var(--border)',padding:'20px 16px',display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:'8px' }}>
         <span style={{ fontFamily:"'Geist Mono',monospace",fontSize:'11px',color:'var(--text-4)' }}>
           SystemMD · systemmd.com
         </span>
