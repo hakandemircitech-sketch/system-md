@@ -639,8 +639,8 @@ export default function LandingClient() {
         </div>
       </div>
 
-      {/* ── SECTION 7: PRICING ── */}
-      <div id="pricing" style={{ borderTop:'1px solid var(--border)',paddingTop:'80px',paddingBottom:'80px' }}>
+      {/* ── SECTION 7: PRICING ── (gizli — fiyatlandırma hazır olunca display:'none' kaldır) */}
+      <div id="pricing" style={{ borderTop:'1px solid var(--border)',paddingTop:'80px',paddingBottom:'80px', display:'none' }}>
         <div style={{ maxWidth:'960px',width:'100%',margin:'0 auto',padding:'0 24px',boxSizing:'border-box' }}>
           <p style={{ fontFamily:"'Geist Mono',monospace",fontSize:'10px',color:'var(--text-4)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'16px',textAlign:'center' }}>
             pricing
